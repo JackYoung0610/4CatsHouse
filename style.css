@@ -1,0 +1,15 @@
+/* 4CatsHouse - style.css */
+/* 版本號: 0.001 */
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+canvas {
+  display: block; /* border: 1px solid black; */
+}

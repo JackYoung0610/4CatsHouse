@@ -1,8 +1,26 @@
 // 4CatsHouse - script.js
 // 版本號: 0.002
 
+
+/**
+ * 獲取 canvas 元素並檢查其是否存在。
+ * @type {HTMLCanvasElement}
+ * @throws {Error} 如果找不到具有 id "gameCanvas" 的 canvas 元素。
+ */
 const canvas = document.getElementById('gameCanvas');
+if (!canvas) {
+    throw new Error('Canvas element with id "gameCanvas" not found.');
+}
+
+/**
+ * 獲取 canvas 的 2D 繪圖上下文。
+ * @type {CanvasRenderingContext2D}
+ * @throws {Error} 如果無法獲取 2D 繪圖上下文。
+ */
 const ctx = canvas.getContext('2d');
+if (!ctx) {
+    throw new Error('Failed to get 2D context for canvas.');
+}
 
 // 遊戲的基本設定
 const gravity = 0.1;
@@ -61,7 +79,7 @@ const objectTypes = {
         color: 'black', // 小障礙物顏色
         generatePosition: () => ({
             x: canvas.width + Math.random() * 300,
-            y: background.floorY - 30 // 貼齊地面
+            y: background.floorY - 30  // 貼齊地面
         })
     },
     mediumObstacle: {
@@ -107,7 +125,7 @@ const objectTypes = {
         color: 'blue', // 藍色罐罐顏色
         generatePosition: () => ({
             x: canvas.width + Math.random() * 300,
-            y: background.floorY - 20 - 40 // 稍微高於地面
+            y: background.floorY - 20 - 60 // 稍微高於地面
         })
     },
     goldCan: {
@@ -428,37 +446,63 @@ function updateGameLogic() {
 }
 
 //更新判斷與畫面
+/**
+ * 更新遊戲畫面與邏輯的主迴圈函式。
+ * 根據遊戲狀態 (start, playing, gameOver) 執行相應的繪製與邏輯更新。
+ * 使用 requestAnimationFrame 進行畫面更新。
+ */
 function update() {
-    if (gameState === 'start') {
-        drawStartScreen();
+    try {
+        if (gameState === 'start') {
+            // 繪製開始畫面
+            drawStartScreen();
+            requestAnimationFrame(update);
+            return;
+        }
+        if (isGameOver) {
+            // 繪製背景與結算畫面
+            drawBackground();
+            drawGameOver();
+            requestAnimationFrame(update);
+            return;
+        }
+
+        // 更新遊戲邏輯
+        updateGameLogic();
+
+        // 繪製遊戲畫面
+        drawGameScene();
+
+        // 使用 requestAnimationFrame 繼續更新畫面
         requestAnimationFrame(update);
-        return;
+    } catch (error) {
+        // 捕捉並記錄錯誤，提示使用者刷新頁面
+        console.error('Error in game loop:', error);
+        alert('An error occurred during the game. Please refresh the page to continue.');
     }
-    if (isGameOver) {
-        drawBackground();
-        drawGameOver();
-        requestAnimationFrame(update);
-        return;
-    }
-
-    // 更新遊戲邏輯
-    updateGameLogic();
-
-    // 繪製遊戲畫面
-    drawGameScene();
-
-    requestAnimationFrame(update);
 }
+
 
 //取得歷史高分
 function getHighScore() {
-    return localStorage.getItem('highScore') ? parseInt(localStorage.getItem('highScore')) : 0;
+    try {
+        const storedHighScore = localStorage.getItem('highScore');
+        return storedHighScore ? parseInt(storedHighScore) : 0;
+    } catch (error) {
+        console.error('Error accessing localStorage for highScore:', error);
+        return 0; // 返回預設值
+    }
 }
 
 //設定歷史高分
 function setHighScore(score) {
-    localStorage.setItem('highScore', score);
+    try {
+        localStorage.setItem('highScore', score);
+    } catch (error) {
+        console.error('Error saving highScore to localStorage:', error);
+    }
 }
+
 
 //抽取按鈕區域計算邏輯
 function calculateButtonArea(x, y, text, paddingX = 30, paddingY = 15) {
@@ -669,6 +713,26 @@ function handleCatSelection(keyCode) {
     else if (keyCode === 'Digit5') { currentCatIndex = 4; }
     selectedCatIndex = currentCatIndex;
 }
+
+
+/**
+ * 捕捉全域錯誤的處理函式。
+ * @param {string} message - 錯誤訊息。
+ * @param {string} source - 錯誤來源檔案的 URL。
+ * @param {number} lineno - 錯誤發生的行號。
+ * @param {number} colno - 錯誤發生的列號。
+ * @param {Error} error - 錯誤物件。
+ */
+window.onerror = function (message, source, lineno, colno, error) {
+    console.error('Global error caught:', {
+        message,
+        source,
+        lineno,
+        colno,
+        error
+    });
+    alert('An unexpected error occurred. Please refresh the page to continue.');
+};
 
 init();
 update();

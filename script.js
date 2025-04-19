@@ -58,12 +58,25 @@ const STYLES = {
     }
 };
 
-// 小貓的顏色陣列
-const catColors = ['blue', 'orange', 'white', 'black', 'pink'];
-const catNames = ['冰炫風', '醬太郎', '牛奶糖', '青草茶', '炸豬排'];
+const cats = [
+    { name: '冰炫風', color: 'blue', width: 30, height: 30, jumpHeight: 180, shape: 'rectangle', radius: 0 ,isJumping: false,x: canvas.width * 0.3, y: 0,},
+    { name: '醬太郎', color: 'orange', width: 35, height: 35, jumpHeight: 200, shape: 'circle', radius: 18 ,isJumping: false,x: canvas.width * 0.3, y: 0,},
+    { name: '牛奶糖', color: 'white', width: 35, height: 35, jumpHeight: 160, shape: 'rectangle', radius: 0 ,isJumping: false,x: canvas.width * 0.3, y: 0,},
+    { name: '青草茶', color: 'black', width: 40, height: 30, jumpHeight: 190, shape: 'rectangle', radius: 0 ,isJumping: false,x: canvas.width * 0.3, y: 0,},
+    { name: '炸豬排', color: 'pink', width: 30, height: 30, jumpHeight: 150, shape: 'circle', radius: 13,isJumping: false,x: canvas.width * 0.3, y: 0, }
+];
 
-// 貓咪的初始狀態
-const cat = { x: canvas.width * 0.3, y: 0, width: 30, height: 30, velocityY: 0, isJumping: false };
+// 全域變數：貓咪的狀態
+let cat = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+    radius: 0,
+    shape: 'rectangle',
+    velocityY: 0,
+    isJumping: false
+};
 
 // 背景的初始狀態
 const background = { x: 0, width: 0, floorHeight: 0, floorY: 0 };
@@ -77,6 +90,8 @@ const objectTypes = {
         width: 60,
         height: 30,
         color: 'black', // 小障礙物顏色
+        radius: 0, 
+        shape: 'rectangle', // 矩形
         generatePosition: () => ({
             x: canvas.width + Math.random() * 300,
             y: background.floorY - 30  // 貼齊地面
@@ -88,6 +103,8 @@ const objectTypes = {
         width: 50,
         height: 50,
         color: 'darkred', // 中障礙物顏色
+        radius: 25, // 圓形需要半徑
+        shape: 'circle', // 圓形
         generatePosition: () => ({
             x: canvas.width + Math.random() * 300,
             y: background.floorY - 50 // 貼齊地面
@@ -99,6 +116,8 @@ const objectTypes = {
         width: 80,
         height: 80,
         color: 'brown', // 大障礙物顏色
+        radius: 0, 
+        shape: 'rectangle', // 矩形
         generatePosition: () => ({
             x: canvas.width + Math.random() * 300,
             y: background.floorY - 80 // 貼齊地面
@@ -112,6 +131,8 @@ const objectTypes = {
         width: 20,
         height: 20,
         color: 'green', // 綠色罐罐顏色
+        radius: 0,
+        shape: 'rectangle', // 矩形
         generatePosition: () => ({
             x: canvas.width + Math.random() * 300,
             y: background.floorY - 20 //貼齊地面
@@ -123,6 +144,8 @@ const objectTypes = {
         width: 20,
         height: 20,
         color: 'blue', // 藍色罐罐顏色
+        radius: 0,
+        shape: 'rectangle', // 矩形
         generatePosition: () => ({
             x: canvas.width + Math.random() * 300,
             y: background.floorY - 20 - 60 // 稍微高於地面
@@ -134,6 +157,8 @@ const objectTypes = {
         width: 20,
         height: 20,
         color: 'gold', // 金色罐罐顏色
+        radius: 0,
+        shape: 'rectangle', // 矩形
         generatePosition: () => ({
             x: canvas.width + Math.random() * 300,
             y: background.floorY - 20 - 10 // 稍微高於地面
@@ -144,7 +169,7 @@ const objectTypes = {
 //初始化物件表
 let objects = [];
 objects.push(createObject('smallObstacle', objects, 100));
-//objects.push(createObject('mediumObstacle', objects, 100));
+objects.push(createObject('mediumObstacle', objects, 100));
 //objects.push(createObject('largeObstacle', objects, 100));
 objects.push(createObject('greenCan', objects, 100));
 objects.push(createObject('blueCan', objects, 100));
@@ -155,39 +180,45 @@ objects.push(createObject('blueCan', objects, 100));
 function init(resetSelectedCat = true) {
     highScore = getHighScore();
 
-    /**
-     * 設定 canvas 的寬度與高度，並初始化地板與背景的相關屬性。
-     */
+    // 設定 canvas 的寬度與高度
     canvas.width = window.innerWidth * 0.7;
     canvas.height = window.innerHeight * 0.7;
-    const floorHeight = canvas.height / 5; // 地板的高度
-    const floorY = canvas.height - floorHeight; // 地板的 Y 座標
-    cat.y = floorY - cat.height; // 設定貓咪的初始 Y 座標
-    background.width = canvas.width * 2; // 背景的寬度
-    background.x = 0; // 背景的初始 X 座標
-    background.floorHeight = floorHeight; // 設定背景的地板高度
-    background.floorY = floorY; // 設定背景的地板 Y 座標
+    const floorHeight = canvas.height / 5;
+    const floorY = canvas.height - floorHeight;
 
-    /**
-     * 初始化遊戲的分數、時間與狀態。
-     */
-    score = 0; // 分數初始化為 0
-    timeLeft = 60; // 遊戲剩餘時間初始化為 60 秒
-    isGameOver = false; // 遊戲是否結束的狀態
-    cat.velocityY = 0; // 貓咪的垂直速度初始化為 0
-    cat.isJumping = false; // 貓咪是否正在跳躍的狀態
-    isSpaceKeyPressed = false; // 空白鍵是否被按下的狀態
-    gameSpeed = baseGameSpeed; // 遊戲速度初始化為基礎速度
-    gameState = 'start'; // 遊戲狀態初始化為 "start"
-    cat.x = canvas.width * 0.3; // 設定貓咪的初始 X 座標
-    gameStartTime = null; // 重置遊戲開始時間
+    // 初始化背景
+    background.width = canvas.width * 2;
+    background.x = 0;
+    background.floorHeight = floorHeight;
+    background.floorY = floorY;
 
+    // 初始化分數與遊戲狀態
+    score = 0;
+    timeLeft = 60;
+    isGameOver = false;
+    isSpaceKeyPressed = false;
+    gameSpeed = baseGameSpeed;
+    gameState = 'start';
+    gameStartTime = null;
+
+    // 初始化選擇的小貓
     if (resetSelectedCat) {
-        selectedCatIndex = Math.floor(Math.random() * catColors.length);
+        selectedCatIndex = Math.floor(Math.random() * cats.length);
     }
     currentCatIndex = selectedCatIndex;
 
-    // 清除之前的 interval (如果存在)
+    const selectedCat = cats[currentCatIndex];
+    cat.x = selectedCat.x;
+    cat.y = floorY - (selectedCat.shape === 'circle' ? selectedCat.radius * 2 : selectedCat.height);
+    cat.width = selectedCat.width;
+    cat.height = selectedCat.height;
+    cat.radius = selectedCat.radius;
+    cat.shape = selectedCat.shape;
+    cat.velocityY = 0;
+    cat.isJumping = false;
+    cat.name = selectedCat.name; // 新增 name 屬性
+
+    // 清除之前的 interval
     if (gameInterval) {
         clearInterval(gameInterval);
         gameInterval = null;
@@ -196,6 +227,8 @@ function init(resetSelectedCat = true) {
     // 設置事件監聽器
     setupEventListeners();
 }
+
+
 
 function startGameTimer() {
     gameInterval = setInterval(() => {
@@ -212,8 +245,13 @@ function startGameTimer() {
 
 //繪製主角貓咪
 function drawCat() {
-    drawRectangle(cat.x, cat.y, cat.width, cat.height, { fillColor: catColors[currentCatIndex] });
+    if (cat.shape === 'rectangle') {
+        drawRectangle(cat.x, cat.y, cat.width, cat.height, { fillColor: cats[currentCatIndex].color });
+    } else if (cat.shape === 'circle') {
+        drawCircle(cat.x + cat.radius, cat.y + cat.radius, cat.radius, { fillColor: cats[currentCatIndex].color });
+    }
 }
+
 
 //繪製背景
 function drawBackground() {
@@ -248,7 +286,7 @@ function createObject(type, existingObjects, minDistance = 100) {
     while (!isValidPosition && attempts < maxAttempts) {
         position = config.generatePosition();
         isValidPosition = existingObjects.every(
-            (other) => !isTooClose({ x: position.x, y: position.y }, other, minDistance)
+            (other) => !isTooClose({ x: position.x, y: position.y, width: config.width, height: config.height }, other, minDistance)
         );
         attempts++;
     }
@@ -263,15 +301,16 @@ function createObject(type, existingObjects, minDistance = 100) {
         value: config.value,
         x: position.x,
         y: position.y,
-        width: config.width,
-        height: config.height,
-        color: config.color // 新增顏色屬性
+        width: config.width || 0,
+        height: config.height || 0,
+        radius: config.radius || 0,
+        color: config.color,
+        shape: config.shape
     };
 }
 
 //繪製主畫面
 function drawStartScreen() {
-
     drawRectangle(0, 0, canvas.width, canvas.height, { fillColor: 'lightblue' });
     const currentHighScore = getHighScore();
 
@@ -281,19 +320,28 @@ function drawStartScreen() {
     // 主標題
     drawText('4CatsHouse', canvas.width / 2, canvas.height * 0.3, STYLES.text.StartScreenMainTitle);
 
-    const catDisplayWidth = 50;
-    const catDisplayHeight = 50;
-    const catDisplayX = canvas.width / 2 - catDisplayWidth / 2;
-    const catDisplayY = canvas.height * 0.5 - catDisplayHeight / 2;
+    //繪製主角貓咪
+    const selectedCat = cats[currentCatIndex];
+    if (selectedCat.shape === 'rectangle') {
+        drawRectangle(
+            canvas.width / 2 - selectedCat.width / 2,
+            canvas.height * 0.5 - selectedCat.height / 2,
+            selectedCat.width,
+            selectedCat.height,
+            { fillColor: selectedCat.color, strokeColor: 'black', lineWidth: 2 }
+        );
+    } else if (selectedCat.shape === 'circle') {
+        drawCircle(
+            canvas.width / 2,
+            canvas.height * 0.5,
+            selectedCat.radius,
+            { fillColor: selectedCat.color, strokeColor: 'black', lineWidth: 2 }
+        );
+    }
 
-    drawRectangle(catDisplayX, catDisplayY, catDisplayWidth, catDisplayHeight, {
-        fillColor: catColors[currentCatIndex],
-        strokeColor: 'black',
-        lineWidth: 2
-    });
 
     // 顯示小貓名稱
-    drawText(catNames[currentCatIndex], catDisplayX + catDisplayWidth / 2, catDisplayY + catDisplayHeight / 2 + 7, {
+    drawText(selectedCat.name, canvas.width / 2, canvas.height * 0.6, {
         font: '20px sans-serif',
         color: 'white',
         textAlign: 'center',
@@ -302,27 +350,27 @@ function drawStartScreen() {
 
     // 按鈕類：點擊後開始用餐
     drawText('點擊後開始用餐', canvas.width / 2, canvas.height * 0.7, STYLES.text.StartScreenButton);
-
-    // 保存小貓顯示區域的邊界，方便點擊檢測
-    canvas.catDisplayArea = {
-        x: catDisplayX,
-        y: catDisplayY,
-        width: catDisplayWidth,
-        height: catDisplayHeight
-    };
 }
+
 
 //繪製遊戲
 function drawGameScene() {
     drawBackground();
     objects.forEach((object) => {
-        drawRectangle(object.x, object.y, object.width, object.height, {
-            fillColor: object.color // 使用物件的顏色屬性
-        });
+        if (object.shape === 'rectangle') {
+            drawRectangle(object.x, object.y, object.width, object.height, {
+                fillColor: object.color
+            });
+        } else if (object.shape === 'circle') {
+            drawCircle(object.x, object.y, object.radius, {
+                fillColor: object.color
+            });
+        }
     });
     drawCat();
     drawScoreAndTime();
 }
+
 
 //繪製結算畫面
 function drawGameOver() {
@@ -332,7 +380,7 @@ function drawGameOver() {
     drawText('用餐時間結束囉', canvas.width / 2, canvas.height / 2 - 80, STYLES.text.GameOverScreenMessage);
 
     // 結算訊息類：分數
-    drawText(`${catNames[currentCatIndex]} 得到的分數：${Math.floor(score)}`, canvas.width / 2, canvas.height / 2 - 40, STYLES.text.GameOverScreenMessage);
+    drawText(`${cat.name} 得到的分數：${Math.floor(score)}`, canvas.width / 2, canvas.height / 2 - 40, STYLES.text.GameOverScreenMessage);
 
     const previousHighScore = highScore;
     let congratsMessage = '';
@@ -342,7 +390,7 @@ function drawGameOver() {
     } else if (Math.floor(score) === previousHighScore && previousHighScore > 0) {
         congratsMessage = '哇，差那一個小罐罐就能創造歷史啦！';
     } else if (Math.floor(score) > previousHighScore) {
-        congratsMessage = `太棒啦，${catNames[currentCatIndex]} 果然是能創造奇蹟的！`;
+        congratsMessage = `太棒啦，${cat.name} 果然是能創造奇蹟的！`;
         drawText(`全新的最高得分為：${Math.max(highScore, Math.floor(score))}`, canvas.width / 2, canvas.height / 2 + 80, STYLES.text.GameOverScreenMessage);
         setHighScore(Math.max(highScore, Math.floor(score)));
     }
@@ -361,6 +409,7 @@ function drawGameOver() {
     canvas.backToStartButtonArea = calculateButtonArea(canvas.width * 0.75, canvas.height * 0.8, '回到主畫面');
     drawText('回到主畫面', canvas.width * 0.75, canvas.height * 0.8, STYLES.text.GameOverScreenButton);
 }
+
 
 //繪製文字，支援字體樣式、對齊方式等參數。
 function drawText(text, x, y, options = {}) {
@@ -386,6 +435,31 @@ function drawRectangle(x, y, width, height, options = {}) {
     }
 }
 
+/**
+ * 繪製圓形的邏輯，支援填充顏色與邊框顏色。
+ * @param {number} x - 圓心的 X 座標。
+ * @param {number} y - 圓心的 Y 座標。
+ * @param {number} radius - 圓的半徑。
+ * @param {Object} options - 繪製選項，包括填充顏色與邊框顏色。
+ */
+function drawCircle(x, y, radius, options = {}) {
+    const { fillColor = 'black', strokeColor = null, lineWidth = 1 } = options;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+
+    if (fillColor) {
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+    }
+
+    if (strokeColor) {
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = lineWidth;
+        ctx.stroke();
+    }
+    ctx.closePath();
+}
+
 //包含所有與遊戲邏輯相關
 function updateGameLogic() {
     // 更新遊戲速度
@@ -407,25 +481,22 @@ function updateGameLogic() {
         // 如果物件超出畫面，重新生成位置
         if (object.x < -object.width) {
             object.x = canvas.width + Math.random() * 300;
-            object.y = background.floorY - object.height - 10;
+            object.y = background.floorY - (object.height || object.radius * 2) - 10;
         }
 
         // 碰撞檢測
-        if (
-            cat.x < object.x + object.width &&
-            cat.x + cat.width > object.x &&
-            cat.y < object.y + object.height &&
-            cat.y + cat.height > object.y
-        ) {
+        if (isColliding(cat, object)) {
             handleCollision(object);
         }
-    });
+      });
+
 
     // 小貓跳躍邏輯
     if (cat.isJumping) {
-        const groundLevel = background.floorY - cat.height;
-        const maxJumpHeight = 6 * cat.height;
+        const groundLevel = background.floorY - (cat.shape === 'circle' ? cat.radius * 2 : cat.height);
+        const maxJumpHeight = cats[currentCatIndex].jumpHeight;
         const targetY = groundLevel - maxJumpHeight;
+
         if (cat.velocityY < 0) {
             if (isSpaceKeyPressed && cat.y > targetY) {
                 cat.y += cat.velocityY;
@@ -482,6 +553,22 @@ function update() {
     }
 }
 
+/**
+ * 選擇並初始化控制的小貓。
+ * @param {Object} selectedCat - 從 cats 陣列中選擇的小貓物件。
+ * @param {number} floorY - 地板的 Y 座標，用於計算小貓的初始位置。
+ */
+function selectControlledCat(selectedCat, floorY) {
+    cat.x = selectedCat.x;
+    cat.y = floorY - (selectedCat.shape === 'circle' ? selectedCat.radius * 2 : selectedCat.height);
+    cat.width = selectedCat.width;
+    cat.height = selectedCat.height;
+    cat.radius = selectedCat.radius;
+    cat.shape = selectedCat.shape;
+    cat.velocityY = 0;
+    cat.isJumping = false;
+    cat.name = selectedCat.name; // 設定小貓的名稱
+}
 
 //取得歷史高分
 function getHighScore() {
@@ -566,14 +653,20 @@ function handleMouseDown(event) {
         } else if (isClickInside(clickX, clickY, canvas.backToStartButtonArea)) {
             handleBackToStart();
         }
-    } else if (gameState === 'start' && isClickInsideCat(clickX, clickY)) {
-        cycleCat();
     } else if (gameState === 'start') {
-        startGame();
+        // 先判斷是否點擊到小貓
+        if (isClickInsideCat(clickX, clickY)) {
+            cycleCat(); // 切換小貓
+        } else {
+            startGame(); // 未點擊小貓則進入遊戲
+        }
     } else if (!cat.isJumping && gameState === 'playing') {
         startJump();
     }
 }
+
+
+
 
 function handleMouseUp(event) {
     endJump();
@@ -592,19 +685,84 @@ function handleTouchStart(event) {
         } else if (isClickInside(touchX, touchY, canvas.backToStartButtonArea)) {
             handleBackToStart();
         }
-    } else if (gameState === 'start' && isClickInsideCat(touchX, touchY)) {
-        cycleCat();
     } else if (gameState === 'start') {
-        startGame();
+        // 先判斷是否點擊到小貓
+        if (isClickInsideCat(touchX, touchY)) {
+            cycleCat(); // 切換小貓
+        } else {
+            startGame(); // 未點擊小貓則進入遊戲
+        }
     } else if (!cat.isJumping && gameState === 'playing') {
         startJump();
     }
 }
 
+
 function handleTouchEnd(event) {
     endJump();
 }
 
+/**
+ * 檢查兩個物件是否發生碰撞。
+ * @param {Object} obj1 - 第一個物件，包含形狀、位置和尺寸資訊。
+ * @param {Object} obj2 - 第二個物件，包含形狀、位置和尺寸資訊。
+ * @returns {boolean} 如果兩個物件發生碰撞，返回 true，否則返回 false。
+ */
+function isColliding(obj1, obj2) {
+    if (obj1.shape === 'rectangle' && obj2.shape === 'rectangle') {
+        return isRectangleColliding(obj1, obj2);
+    } else if (obj1.shape === 'circle' && obj2.shape === 'circle') {
+        return isCircleColliding(obj1, obj2);
+    } else if (obj1.shape === 'rectangle' && obj2.shape === 'circle') {
+        return isRectangleCircleColliding(obj1, obj2);
+    } else if (obj1.shape === 'circle' && obj2.shape === 'rectangle') {
+        return isRectangleCircleColliding(obj2, obj1);
+    }
+    return false; // 預設不碰撞
+}
+
+
+/**
+ * 檢查兩個矩形是否發生碰撞。
+ * @param {Object} rect1 - 第一個矩形，包含 x, y, width, height 屬性。
+ * @param {Object} rect2 - 第二個矩形，包含 x, y, width, height 屬性。
+ * @returns {boolean} 如果兩個矩形發生碰撞，返回 true，否則返回 false。
+ */
+function isRectangleColliding(rect1, rect2) {
+    return (
+        rect1.x < rect2.x + rect2.width &&
+        rect1.x + rect1.width > rect2.x &&
+        rect1.y < rect2.y + rect2.height &&
+        rect1.y + rect1.height > rect2.y
+    );
+}
+
+/**
+ * 檢查兩個圓形是否發生碰撞。
+ * @param {Object} circle1 - 第一個圓形，包含 x, y, radius 屬性。
+ * @param {Object} circle2 - 第二個圓形，包含 x, y, radius 屬性。
+ * @returns {boolean} 如果兩個圓形發生碰撞，返回 true，否則返回 false。
+ */
+function isCircleColliding(circle1, circle2) {
+    const dx = circle1.x - circle2.x;
+    const dy = circle1.y - circle2.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance < circle1.radius + circle2.radius;
+}
+
+/**
+ * 檢查矩形與圓形是否發生碰撞。
+ * @param {Object} rect - 矩形，包含 x, y, width, height 屬性。
+ * @param {Object} circle - 圓形，包含 x, y, radius 屬性。
+ * @returns {boolean} 如果矩形與圓形發生碰撞，返回 true，否則返回 false。
+ */
+function isRectangleCircleColliding(rect, circle) {
+    const closestX = Math.max(rect.x, Math.min(circle.x, rect.x + rect.width));
+    const closestY = Math.max(rect.y, Math.min(circle.y, rect.y + rect.height));
+    const dx = circle.x - closestX;
+    const dy = circle.y - closestY;
+    return dx * dx + dy * dy < circle.radius * circle.radius;
+}
 
 //處理物件的碰撞效果
 function handleCollision(object) {
@@ -647,20 +805,45 @@ function isClickInside(x, y, rect) {
 }
 
 function isClickInsideCat(x, y) {
-    if (canvas.catDisplayArea) {
-        return isInsideRectangle(x, y, canvas.catDisplayArea);
+    const selectedCat = cats[currentCatIndex];
+    const padding = 10; // 擴大點擊範圍
+    const catCenterX = canvas.width / 2;
+    const catCenterY = canvas.height * 0.5;
+
+    if (selectedCat.shape === 'rectangle') {
+        return isInsideRectangle(x, y, {
+            x: catCenterX - selectedCat.width / 2 - padding,
+            y: catCenterY - selectedCat.height / 2 - padding,
+            width: selectedCat.width + padding * 2,
+            height: selectedCat.height + padding * 2
+        });
+    } else if (selectedCat.shape === 'circle') {
+        const dx = x - catCenterX;
+        const dy = y - catCenterY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        return distance <= selectedCat.radius + padding; // 擴大圓形點擊範圍
     }
     return false;
 }
+
+
+
 
 //碰撞檢測
 function isInsideRectangle(x, y, rect) {
     return x > rect.x && x < rect.x + rect.width && y > rect.y && y < rect.y + rect.height;
 }
 
+//變更小貓
 function cycleCat() {
-    currentCatIndex = (currentCatIndex + 1) % catColors.length;
+    currentCatIndex = (currentCatIndex + 1) % cats.length;
+
+    // 呼叫 selectControlledCat 更新 cat
+    selectControlledCat(cats[currentCatIndex], background.floorY);
 }
+
+
+
 
 function startGame() {
     gameState = 'playing';
@@ -670,10 +853,13 @@ function startGame() {
 }
 
 function startJump() {
-    cat.isJumping = true;
-    cat.velocityY = -4;
-    isSpaceKeyPressed = true;
+    if (!cat.isJumping) {
+        cat.isJumping = true;
+        cat.velocityY = -Math.sqrt(2 * gravity * cats[currentCatIndex].jumpHeight); // 根據跳躍高度計算初速度
+        isSpaceKeyPressed = true;
+    }
 }
+
 
 function endJump() {
     isSpaceKeyPressed = false;
@@ -707,11 +893,16 @@ function handleBackToStart() {
     }
 }
 
+//選擇小貓
 function handleCatSelection(keyCode) {
-    if (keyCode === 'Digit1') { currentCatIndex = 0; } else if (keyCode === 'Digit2') { currentCatIndex = 1; }
-    else if (keyCode === 'Digit3') { currentCatIndex = 2; } else if (keyCode === 'Digit4') { currentCatIndex = 3; }
+    if (keyCode === 'Digit1') { currentCatIndex = 0; }
+    else if (keyCode === 'Digit2') { currentCatIndex = 1; }
+    else if (keyCode === 'Digit3') { currentCatIndex = 2; }
+    else if (keyCode === 'Digit4') { currentCatIndex = 3; }
     else if (keyCode === 'Digit5') { currentCatIndex = 4; }
-    selectedCatIndex = currentCatIndex;
+
+    // 呼叫 selectControlledCat 更新 cat
+    selectControlledCat(cats[currentCatIndex], background.floorY);
 }
 
 

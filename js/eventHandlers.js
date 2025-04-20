@@ -90,11 +90,16 @@ function handleTouchStart(ctx, canvas, event) {
 
 function handleTouchEnd(ctx, canvas, event) {
     event.preventDefault();
-    const touch = event.touches[0];
-    const rect = canvas.getBoundingClientRect();
-    const releaseX = touch.clientX - rect.left;
-    const releaseY = touch.clientY - rect.top;
-    procRelease(ctx, canvas, releaseX, releaseY);
+    if (event.touches.length > 0) {
+        const touch = event.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const releaseX = touch.clientX - rect.left;
+        const releaseY = touch.clientY - rect.top;
+        procRelease(ctx, canvas, releaseX, releaseY);
+    }else {
+        console.log("Debug: No active touches on touchend.");
+    }
+
 }
 
 // 視窗大小改變事件

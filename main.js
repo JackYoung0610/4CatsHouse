@@ -1,6 +1,6 @@
 ﻿// 4CatsHouse - main.js
 // 版本號: 0.005
-export const gameVersion = 'v 0.006'
+export const gameVersion = 'v 0.007'
 
 import { resolutionScaleX, resolutionScaleY } from './js/constants.js';
 import { gameStates, mainCat, background,  objects } from './js/gameState.js';
@@ -35,7 +35,13 @@ if (!ctx) {
 // 初始化 中央室
 function init_central(options = {}) {
  
-    const { bInitAll = false, bInitCanvas = false, bInitGameStates = false,bInitBackgroud = false , bInitMainCat = false, bInitObjects = false} = options;
+    const { bInitAll = false, 
+                    // 初始化選項
+                    bInitCanvas = false, bInitGameStates = false,bInitBackgroud = false , bInitMainCat = false, bInitObjects = false,
+
+                    bRandSelectCat = false 
+
+                } = options;
 
     // 初始化畫布
     if (bInitAll || bInitCanvas){
@@ -51,11 +57,11 @@ function init_central(options = {}) {
     }
     // 初始化小貓
     if (bInitAll || bInitMainCat){
-        init_mainCat(bInitAll);
+        init_mainCat(bRandSelectCat);
     }
     // 初始化物件
      if (bInitAll || bInitObjects){
-        init_objects(bInitAll);
+        init_objects();
     }
 
 }
@@ -102,10 +108,10 @@ function init_background() {
 }
 
 // 初始化 小貓
-function init_mainCat(randSelectCat=false) {
+function init_mainCat(bRandSelectCat=false) {
 
     // 亂數換小貓選擇的小貓
-    if (randSelectCat) {
+    if (bRandSelectCat) {
         mainCat.currentCatIndex = Math.floor(Math.random() * mainCat.allCats.length);
     }
 
@@ -148,6 +154,7 @@ function update() {
             drawGamePhase_StartScreen(ctx, canvas);
         
             requestAnimationFrame(update);
+
             return;
         }
 
@@ -157,6 +164,7 @@ function update() {
             drawGamePhase_GameOver(ctx, canvas);
         
             requestAnimationFrame(update);
+
             return;
         }
 
@@ -197,7 +205,7 @@ window.onerror = function (message, source, lineno, colno, error) {
 
 
 //初始化
-init_central( {bInitAll : true});
+init_central( {bInitAll : true , bRandSelectCat : true});
 
 // 設置事件監聽器
 addEventListeners(ctx, canvas);
@@ -205,5 +213,5 @@ addEventListeners(ctx, canvas);
 update();
 
 //移除事件監聽器
-removeEventListeners(ctx, canvas);
+//removeEventListeners(ctx, canvas);
 

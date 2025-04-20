@@ -28,6 +28,7 @@ export function procKeyDown(ctx, canvas, event) {
         if (event.code === 'Space'){
             gamePlay();
         }
+
     } else if (gameStates.isGameOver){
 
          if (event.code === 'KeyR') {
@@ -36,9 +37,9 @@ export function procKeyDown(ctx, canvas, event) {
             gameToStart();
            }
 
-    }else if (!selectedCat.isJumping && gameStates.gameState === 'playing') {
+    }else if (gameStates.gameState === 'playing') {
 
-        if (event.code === 'Space') {
+        if (event.code === 'Space' && !selectedCat.isJumping) {
             mainCatStartJump();
         }
 
@@ -89,8 +90,12 @@ export function procClick(ctx, canvas, x, y) {
             gameToStart();
         }
 
-    }else if (!selectedCat.isJumping && gameStates.gameState === 'playing') {
-        mainCatStartJump();
+    }else if (gameStates.gameState === 'playing') {
+
+        if ( !selectedCat.isJumping) {
+            mainCatStartJump();
+        }
+        
     }
 
 }
@@ -151,30 +156,26 @@ function cycleCat() {
 //回到主畫面
 function gameToStart() {
     if (gameStates.isGameOver) {
-        gameStates.isGameOver = false;
-        gameStates.gameState = 'start';
-        init_central();
+        init_central( {bInitAll : true , bRandSelectCat : true} );
     }
 }
 
 //進入遊戲
 function gamePlay() {
+
+    init_central( {bInitAll : true} );
     gameStates.gameState = 'playing';
-
-    const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
-    selectedCat.y = background.floorY - selectedCat.height;
-
     startGameTimer(); // 開始計時器並記錄開始時間
+
 }
 
 //重新開始
 function gameRePlay() {
-    if (gameStates.isGameOver) {
-        init(false);
-        gameStates.isGameOver = false;
-        gameStates.gameState = 'playing';
-        startGameTimer(); // 重新開始計時器並記錄開始時間
-    }
+
+    init_central( {bInitAll : true} );
+    gameStates.gameState = 'playing';
+    startGameTimer(); // 重新開始計時器並記錄開始時間
+
 }
 
 //開始計時
@@ -216,9 +217,7 @@ function mainCatEndJump() {
 
 //將最高分清除為0
 function clearHighScore() {
-    if (gameStates.gameState === 'start') {
         localStorage.setItem('highScore', 0);
-        init();
+        init_central( {init_gameStates : true });
         console.log('Debug: 歷史最高分已重置為 0 (按下 C)');
-    }
 }

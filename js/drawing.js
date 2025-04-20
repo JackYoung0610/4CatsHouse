@@ -2,7 +2,7 @@
 
 import {   gameVersion } from '../main.js';
 import {   STYLES } from './constants.js';
-import { calculateButtonArea } from './utils.js';
+import { calculateButtonArea, setHighScore } from './utils.js';
 import { gameStates, mainCat, background, objects } from './gameState.js';
 
 /**
@@ -197,26 +197,35 @@ export function drawGamePhase_GameOver(ctx, canvas) {
     // 清除畫布
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    drawRectangle(ctx, 0, 0, canvas.width, canvas.height, { fillColor: 'rgba(0, 0, 0, 0.5)' });
+    drawRectangle(ctx, 0, 0, canvas.width, canvas.height, { fillColor: 'black' });
 
     const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
-    const previousHighScore = gameStates.highScore;
+    const HighScore = gameStates.highScore;
+    const currentScore = gameStates.score
     let congratsMessage = '';
 
     drawText(ctx, '用餐時間結束囉', canvas.width / 2, canvas.height / 2 - 80, STYLES.text.GameOverScreenMessage);
     drawText(ctx, `${selectedCat.name} 得到的分數：${Math.floor(gameStates.score)}`, canvas.width / 2, canvas.height / 2 - 40, STYLES.text.GameOverScreenMessage);
 
-    if (Math.floor(gameStates.score) < previousHighScore || (Math.floor(gameStates.score) === 0 && previousHighScore === 0)) {
+    if (Math.floor(currentScore) < Math.floor(HighScore)) {
+        // 如果當前分數小於最高分，顯示鼓勵訊息
         congratsMessage = '太可惜啦，再加油多吃一些罐罐吧！';
-    } else if (Math.floor(gameStates.score) === previousHighScore && previousHighScore > 0) {
+
+    } else if  (Math.floor(currentScore) === Math.floor(HighScore))  {
+        // 如果當前分數等於最高分，顯示鼓勵訊息
         congratsMessage = '哇，差那一個小罐罐就能創造歷史啦！';
-    } else if (Math.floor(gameStates.score) > previousHighScore) {
+
+    } else if  (Math.floor(currentScore) > Math.floor(HighScore)) {
+        // 如果當前分數大於最高分，顯示鼓勵訊息
         congratsMessage = `太棒啦，${selectedCat.name} 果然是能創造奇蹟的！`;
         drawText(ctx, `全新的最高得分為：${Math.max(gameStates.highScore, Math.floor(gameStates.score))}`, canvas.width / 2, canvas.height / 2 + 80, STYLES.text.GameOverScreenMessage);
+        setHighScore(currentScore);
     }
 
+
+
     // 顯示狀態類：最高分
-    drawText(ctx, `貓史上最高得分：${previousHighScore}`, canvas.width / 2, canvas.height / 2, STYLES.text.GameOverScreenMessage);
+    drawText(ctx, `貓史上最高得分：${HighScore}`, canvas.width / 2, canvas.height / 2, STYLES.text.GameOverScreenMessage);
     // 結算訊息類：提示訊息
     drawText(ctx, congratsMessage, canvas.width / 2, canvas.height / 2 + 40, STYLES.text.GameOverScreenMessage);
 

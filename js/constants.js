@@ -1,6 +1,10 @@
 ﻿// constants.js
 // 遊戲的基礎設定
 
+//遊戲畫面縮放率
+export const resolutionScaleX = 0.7;
+export const resolutionScaleY = 0.7;
+
 // 定義重力常數，用於控制跳躍物理效果
 export const gravity = 0.1;
 

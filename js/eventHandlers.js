@@ -1,6 +1,6 @@
 ﻿// eventHandlers.js
 
-import { procKeyDown, procKeyUp, procClick, procRelease } from './inputLogic.js';
+import { procKeyDown, procKeyUp, procClick, procRelease, procWindowResize } from './inputLogic.js';
 
 /**
  * 註冊所有的事件監聽器。
@@ -19,6 +19,9 @@ export function addEventListeners(ctx, canvas) {
     // 觸控事件
     canvas.addEventListener('touchstart', (event) => handleTouchStart(ctx, canvas, event), false);
     canvas.addEventListener('touchend', (event) => handleTouchEnd(ctx, canvas, event), false);
+
+    // 監聽視窗大小改變事件
+    window.addEventListener('resize', handleWindowResize);
 }
 
 /**
@@ -42,6 +45,9 @@ export function removeEventListeners(ctx, canvas) {
     // 觸控事件
     canvas.removeEventListener('touchstart', handleTouchStart, false);
     canvas.removeEventListener('touchend', handleTouchEnd, false);
+
+    // 視窗大小改變事件
+    window.removeEventListener('resize', handleWindowResize);
 }
 
 // 鍵盤事件
@@ -90,3 +96,9 @@ function handleTouchEnd(ctx, canvas, event) {
     const releaseY = touch.clientY - rect.top;
     procRelease(ctx, canvas, releaseX, releaseY);
 }
+
+// 視窗大小改變事件
+function handleWindowResize() {
+    procWindowResize();
+}
+

@@ -1,14 +1,15 @@
 ﻿// 4CatsHouse - main.js
 // 版本號: 0.005
-export const gameVersion = 'v 0.005'
+export const gameVersion = 'v 0.006'
 
+import { resolutionScaleX, resolutionScaleY } from './js/constants.js';
 import { gameStates, mainCat, background,  objects } from './js/gameState.js';
 import { getHighScore,  calculateButtonArea } from './js/utils.js';
 import { addEventListeners, removeEventListeners } from './js/eventHandlers.js';
 import { drawGamePhase_StartScreen, drawGamePhase_GameScene, drawGamePhase_GameOver } from './js/drawing.js';
 import { updateGameLogic, createObject } from './js/gameLogic.js';
 
-export {  init };
+export {  init_central };
 
 /**
  * 獲取 canvas 元素並檢查其是否存在。
@@ -31,21 +32,44 @@ if (!ctx) {
 }
 
 
-// 遊戲初始化
-function init(resetSelectedCat = true) {
-   
-    
-    // 設定 canvas 的寬度與高度
-    canvas.width = window.innerWidth * 0.7;
-    canvas.height = window.innerHeight * 0.7;
-    const floorHeight = canvas.height / 5;
-    const floorY = canvas.height - floorHeight;
+// 初始化 中央室
+function init_central(options = {}) {
+ 
+    const { bInitAll = false, bInitCanvas = false, bInitGameStates = false,bInitBackgroud = false , bInitMainCat = false, bInitObjects = false} = options;
 
+    // 初始化畫布
+    if (bInitAll || bInitCanvas){
+        init_canvas();
+    }
+    // 初始化遊戲狀態
+    if (bInitAll || bInitGameStates){
+        init_gameStates();
+    }
     // 初始化背景
-    background.width = canvas.width * 2;
-    background.x = 0;
-    background.floorHeight = floorHeight;
-    background.floorY = floorY;
+    if (bInitAll || bInitBackgroud){
+        init_background();
+    }
+    // 初始化小貓
+    if (bInitAll || bInitMainCat){
+        init_mainCat(bInitAll);
+    }
+    // 初始化物件
+     if (bInitAll || bInitObjects){
+        init_objects(bInitAll);
+    }
+
+}
+
+
+// 初始化 遊戲畫布
+function init_canvas() {
+    // 設定 canvas 的寬度與高度
+    canvas.width = window.innerWidth * resolutionScaleX;
+    canvas.height = window.innerHeight * resolutionScaleY;
+}
+
+// 初始化 遊戲狀態
+function init_gameStates() {
 
     // 初始化分數與遊戲狀態
     gameStates.score = 0;
@@ -61,24 +85,54 @@ function init(resetSelectedCat = true) {
         clearInterval(gameStates.gameInterval);
         gameStates.gameInterval = null;
     }
+}
 
-    // 初始化選擇的小貓
-    if (resetSelectedCat) {
+// 初始化 背景
+function init_background() {
+
+    const floorHeight = canvas.height / 5;
+    const floorY = canvas.height - floorHeight;
+
+    // 初始化背景
+    background.width = canvas.width * 2;
+    background.x = 0;
+    background.floorHeight = floorHeight;
+    background.floorY = floorY;
+
+}
+
+// 初始化 小貓
+function init_mainCat(randSelectCat=false) {
+
+    // 亂數換小貓選擇的小貓
+    if (randSelectCat) {
         mainCat.currentCatIndex = Math.floor(Math.random() * mainCat.allCats.length);
     }
-    console.log('mainCat.currentCatIndex  : ', mainCat.allCats[mainCat.currentCatIndex]);
 
+    // 設定小貓的初始位置
+    const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
 
-     //初始化物件表
+    selectedCat.x = canvas.width * 0.3;
+    selectedCat.y = background.floorY - (selectedCat.shape === 'circle' ? selectedCat.radius * 2 : selectedCat.height);
+    selectedCat.velocityY = 0;
+    selectedCat.isJumping = false;
+
+}
+
+// 初始化 物件
+function init_objects(gameLevel = 0) {
+
+    //清空
+    objects.length = 0;
+
+    //初始化物件表
     objects.push(createObject(ctx, canvas,'smallObstacle', objects, 100));
     objects.push(createObject(ctx, canvas,'mediumObstacle', objects, 100));
-    //objects.push(createObject('largeObstacle', objects, 100));
+    objects.push(createObject(ctx, canvas,'largeObstacle', objects, 100));
     objects.push(createObject(ctx, canvas,'greenCan', objects, 100));
     objects.push(createObject(ctx, canvas,'blueCan', objects, 100));
-    //objects.push(createObject('goldCan', objects, 100));
+    objects.push(createObject(ctx, canvas,'goldCan', objects, 100));
 
-    // 設置事件監聽器
-    addEventListeners(ctx, canvas);
 }
 
 //更新判斷與畫面
@@ -123,60 +177,6 @@ function update() {
 }
 
 /**
- * 選擇並初始化控制的小貓。
- * @param {Object} selectedCat - 從 cats 陣列中選擇的小貓物件。
- * @param {number} floorY - 地板的 Y 座標，用於計算小貓的初始位置。
- */
-function initSelectedCat(floorY=0) {
-
-    const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
-
-    selectedCat.x = canvas.width * 0.3;
-    selectedCat.y = floorY - (selectedCat.shape === 'circle' ? selectedCat.radius * 2 : selectedCat.height);
-    selectedCat.velocityY = 0;
-    selectedCat.isJumping = false;
-
-}
-
-
-// 監聽視窗大小改變事件
-window.addEventListener('resize', handleResize);
-
-function handleResize() {
-    // 更新 canvas 的寬度與高度
-    canvas.width = window.innerWidth * 0.7;
-    canvas.height = window.innerHeight * 0.7;
-
-    // 更新地板高度與位置
-    const floorHeight = canvas.height / 5;
-    const floorY = canvas.height - floorHeight;
-    background.floorHeight = floorHeight;
-    background.floorY = floorY;
-
-    // 更新背景寬度
-    background.width = canvas.width * 2;
-
-    // 更新貓咪的位置
-    const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
-    selectedCat.x = canvas.width * selectedCat.x;
-    selectedCat.y = floorY - (selectedCat.shape === 'circle' ? selectedCat.radius * 2 : selectedCat.height);
-
-    // 更新結算畫面按鈕的位置
-    if (canvas.restartButtonArea) {
-        canvas.restartButtonArea = calculateButtonArea(ctx, canvas.width * 0.25, canvas.height * 0.8, '重新再用餐');
-
-    }
-    if (canvas.backToStartButtonArea) {
-        canvas.backToStartButtonArea = calculateButtonArea(ctx, canvas.width * 0.75, canvas.height * 0.8, '回到主畫面');
-    }
-}
-
-function cleanup() {
-    removeEventListeners();
-    // 其他清理邏輯
-}
-
-/**
  * 捕捉全域錯誤的處理函式。
  * @param {string} message - 錯誤訊息。
  * @param {string} source - 錯誤來源檔案的 URL。
@@ -195,5 +195,15 @@ window.onerror = function (message, source, lineno, colno, error) {
     alert('An unexpected error occurred. Please refresh the page to continue.');
 };
 
-init();
+
+//初始化
+init_central( {bInitAll : true});
+
+// 設置事件監聽器
+addEventListeners(ctx, canvas);
+
 update();
+
+//移除事件監聽器
+removeEventListeners(ctx, canvas);
+

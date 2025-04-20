@@ -227,5 +227,6 @@ export function drawGamePhase_GameOver(ctx, canvas) {
     // 按鈕類：回到主畫面
     canvas.backToStartButtonArea = calculateButtonArea(ctx, canvas.width * 0.75, canvas.height * 0.8, '回到主畫面');
     drawText(ctx, '回到主畫面', canvas.width * 0.75, canvas.height * 0.8, STYLES.text.GameOverScreenButton);
+
 }
 

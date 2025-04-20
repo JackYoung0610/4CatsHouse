@@ -4,7 +4,7 @@ import { gravity } from './constants.js';
 import { gameStates, mainCat, background } from './gameState.js';
 import { isInsideRectangle } from './utils.js';
 
-import { init } from '../main.js';
+import { init_central } from '../main.js';
 
 
 //處理按下鍵盤
@@ -95,7 +95,7 @@ export function procClick(ctx, canvas, x, y) {
 
 }
 
-//處理放開效果
+//處理放開點擊效果
 export function procRelease (ctx, canvas, x, y) {
 
     const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
@@ -109,6 +109,12 @@ export function procRelease (ctx, canvas, x, y) {
     }
 
 }
+
+//處理視窗大小變化
+export function procWindowResize(){
+    init_central( {bInitCanvas : true ,  bInitBackgroud : true, bInitMainCat : true});
+}
+
 
 // 檢查是否點擊到小貓
  function isClickInsideCat(ctx, canvas, x, y) {
@@ -147,7 +153,7 @@ function gameToStart() {
     if (gameStates.isGameOver) {
         gameStates.isGameOver = false;
         gameStates.gameState = 'start';
-        init();
+        init_central();
     }
 }
 

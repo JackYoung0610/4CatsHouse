@@ -217,7 +217,9 @@ function mainCatEndJump() {
 
 //將最高分清除為0
 function clearHighScore() {
+
         localStorage.setItem('highScore', 0);
-        init_central( {init_gameStates : true });
+        init_central( {bInitGameStates : true });
         console.log('Debug: 歷史最高分已重置為 0 (按下 C)');
+
 }

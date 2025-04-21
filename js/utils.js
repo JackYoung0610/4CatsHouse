@@ -138,11 +138,12 @@ export function isRectangleCircleColliding(rect, circle) {
  * @param {number} minDistance - 最小距離。
  * @returns {boolean} 如果太接近，返回 true。
  */
-export function isTooClose(obj1, obj2, minDistance) {
+export function isTooClose(obj1, obj2, minDistanceX = 100, minDistanceY = 0) {
+
     const dx = Math.abs(obj1.x - obj2.x);
     const dy = Math.abs(obj1.y - obj2.y);
     const combinedWidth = (obj1.width + obj2.width) / 2;
     const combinedHeight = (obj1.height + obj2.height) / 2;
 
-    return dx < combinedWidth + minDistance && dy < combinedHeight + minDistance;
+    return dx < combinedWidth + minDistanceX && dy < combinedHeight + minDistanceY;
 }

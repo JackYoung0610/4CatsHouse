@@ -22,12 +22,18 @@ export function updateGameLogic(ctx, canvas) {
 
     // 更新物件位置與碰撞檢測
     objects.forEach((object) => {
-        object.x -= gameSpeed;
+        const objectSpeed = gameSpeed + object.speedBonus;
+
+        object.x -= objectSpeed ;
 
         // 如果物件超出畫面，重新生成位置
         if (object.x < -object.width) {
-            object.x = canvas.width + Math.random() * 300;
-            object.y = background.floorY - (object.height || object.radius * 2) - 10;
+            const config = objectTypes[object.type];
+            if (config && typeof config.generatePosition === 'function') {
+                const newPosition = config.generatePosition(canvas, background);
+                object.x = newPosition.x;
+                object.y = newPosition.y;
+            }
         }
 
         // 碰撞檢測
@@ -39,10 +45,11 @@ export function updateGameLogic(ctx, canvas) {
 
     // 小貓跳躍邏輯
     if (selectedCat.isJumping) {
-        const groundLevel = background.floorY - (selectedCat.shape === 'circle' ? selectedCat.radius * 2 : selectedCat.height);
+        const groundLevel = background.floorY - (selectedCat.shape === 'circle' ? selectedCat.radius : selectedCat.height);
         const maxJumpHeight = selectedCat.jumpHeight;
         const targetY = groundLevel - maxJumpHeight;
 
+        // 更新小貓的 Y 軸位置 : 上升階段
         if (selectedCat.velocityY < 0) {
             if (selectedCat.isJumping && selectedCat.y > targetY) {
                 selectedCat.y += selectedCat.velocityY;
@@ -51,10 +58,12 @@ export function updateGameLogic(ctx, canvas) {
             }
         }
 
+        // 更新小貓的 Y 軸位置 : 下降階段
         if (selectedCat.velocityY >= 0) {
-            selectedCat.velocityY += gravity;
+            selectedCat.velocityY += (gravity + selectedCat.catGravity);
             selectedCat.y += selectedCat.velocityY;
         }
+
         // 碰撞地面
         if (selectedCat.y >= groundLevel) {
             selectedCat.y = groundLevel;
@@ -66,6 +75,7 @@ export function updateGameLogic(ctx, canvas) {
 
 //處理物件的碰撞效果
 function handleCollision(ctx, canvas, object) {
+
     switch (object.effect) {
         case 'addScore':
             gameStates.score += object.value;
@@ -81,15 +91,22 @@ function handleCollision(ctx, canvas, object) {
             break;
     }
 
-    // 使用 createObject 重新生成物件位置
-    const newObject = createObject(ctx, canvas, object.type, objects, 100);
-    object.x = newObject.x;
-    object.y = newObject.y;
+    // 重新生成物件位置
+    const config = objectTypes[object.type];
+     if (config && typeof config.generatePosition === 'function') {
+         const newPosition = config.generatePosition(canvas, background);
+         object.x = newPosition.x;
+         object.y = newPosition.y;
+     }
+
 }
 
 //生成物件
-export function createObject(ctx, canvas, type, existingObjects, minDistance = 100) {
+export function createObject(ctx, canvas, type, existingObjects, options = {}) {
+
     const config = objectTypes[type];
+    const { fixPositionX = null  ,fixPositionY = null , minDistanceX = 100, minDistanceY = 0 } = options;
+
     if (!config) {
         throw new Error(`未知的物件類型: ${type}`);
     }
@@ -99,33 +116,32 @@ export function createObject(ctx, canvas, type, existingObjects, minDistance = 1
     }
 
     let position;
-    let isValidPosition = false;
+    let bIsTooClose = true;
     let attempts = 0;
     const maxAttempts = 100;
 
-    while (!isValidPosition && attempts < maxAttempts) {
-        position = config.generatePosition(canvas, background); // 傳遞 canvas 和 background
-        isValidPosition = existingObjects.every(
-            (other) => !isTooClose({ x: position.x, y: position.y, width: config.width, height: config.height }, other, minDistance)
+   while (bIsTooClose && attempts < maxAttempts) {
+        position = config.generatePosition.call(config, canvas, background);
+
+        // 檢查位置是否有效
+        bIsTooClose = existingObjects.some(
+            (other) => isTooClose({ x: position.x, y: position.y, width: config.width, height: config.height }, other, config.width+20, config.height+20)
         );
+
         attempts++;
     }
-
-    if (!isValidPosition) {
+    if (bIsTooClose) {
         console.warn(`無法為 ${type} 生成有效位置，超過最大嘗試次數`);
     }
 
     return {
         type,
-        effect: config.effect,
-        value: config.value,
+
+        ...config,
+
         x: position.x,
         y: position.y,
-        width: config.width || 0,
-        height: config.height || 0,
-        radius: config.radius || 0,
-        color: config.color,
-        shape: config.shape
+        
     };
 }
 

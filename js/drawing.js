@@ -32,11 +32,14 @@ export function drawText(ctx, text, x, y, options = {}) {
  * @param {Object} options - 繪製選項（填充顏色、邊框顏色等）。
  */
 export function drawRectangle(ctx, x, y, width, height, options = {}) {
+
     const { fillColor = 'black', strokeColor = null, lineWidth = 1 } = options;
+
     if (fillColor) {
         ctx.fillStyle = fillColor;
         ctx.fillRect(x, y, width, height);
     }
+
     if (strokeColor) {
         ctx.strokeStyle = strokeColor;
         ctx.lineWidth = lineWidth;
@@ -108,7 +111,8 @@ export function drawCat(ctx) {
     if (selectedCat.shape === 'rectangle') {
         drawRectangle(ctx, selectedCat.x, selectedCat.y, selectedCat.width, selectedCat.height, { fillColor: selectedCat.fillColor, strokeColor:selectedCat.strokeColor});
     } else if (selectedCat.shape === 'circle') {
-        drawCircle(ctx, selectedCat.x + selectedCat.radius, selectedCat.y + selectedCat.radius, selectedCat.radius, { fillColor: selectedCat.fillColor, strokeColor:selectedCat.strokeColor });
+        //drawCircle(ctx, selectedCat.x + selectedCat.radius, selectedCat.y + selectedCat.radius, selectedCat.radius, { fillColor: selectedCat.fillColor, strokeColor:selectedCat.strokeColor });
+        drawCircle(ctx, selectedCat.x , selectedCat.y , selectedCat.radius, { fillColor: selectedCat.fillColor, strokeColor:selectedCat.strokeColor });
     }
 
 }
@@ -146,16 +150,17 @@ export function drawGamePhase_StartScreen(ctx, canvas) {
     const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
     if (selectedCat.shape === 'rectangle') {
          selectedCat.x = (canvas.width * 0.5) - (selectedCat.width * 0.5);
-        selectedCat.y = (canvas.height * 0.5) - (selectedCat.height * 0.5);
+        selectedCat.y = (canvas.height * 0.5) - (selectedCat.height * 0.8) ;
     } else if (selectedCat.shape === 'circle') {
-        selectedCat.x = (canvas.width * 0.5) - selectedCat.radius;
-        selectedCat.y = (canvas.height * 0.5) - selectedCat.radius;
+        selectedCat.x = (canvas.width * 0.5) ;
+        selectedCat.y = (canvas.height * 0.5) - (selectedCat.radius *0.8);
     }
     drawCat(ctx);
 
     drawText(ctx, selectedCat.name, canvas.width / 2, canvas.height * 0.6, { font: '20px sans-serif', color: 'white', textAlign: 'center' });
     drawText(ctx, '點擊後開始用餐', canvas.width / 2, canvas.height * 0.7, STYLES.text.StartScreenButton);
     drawText(ctx, gameVersion , canvas.width - 50 , canvas.height - 10, STYLES.text.StartScreenButton);
+
 }
 
 /**
@@ -175,9 +180,9 @@ export function drawGamePhase_GameScene(ctx, canvas) {
     // 繪製遊戲物件
     objects.forEach((object) => {
         if (object.shape === 'rectangle') {
-            drawRectangle(ctx, object.x, object.y, object.width, object.height, { fillColor: object.color });
+            drawRectangle(ctx, object.x, object.y, object.width, object.height, { fillColor: object.fillColor , strokeColor: object.strokeColor});
         } else if (object.shape === 'circle') {
-            drawCircle(ctx, object.x, object.y, object.radius, { fillColor: object.color });
+            drawCircle(ctx, object.x, object.y, object.radius, { fillColor: object.fillColor , strokeColor: object.strokeColor });
         }
     });
 
@@ -185,6 +190,7 @@ export function drawGamePhase_GameScene(ctx, canvas) {
     drawCat(ctx);
     // 繪製分數與時間
     drawScoreAndTime(ctx, canvas);
+
 }
 
 /**
@@ -221,8 +227,6 @@ export function drawGamePhase_GameOver(ctx, canvas) {
         drawText(ctx, `全新的最高得分為：${Math.max(gameStates.highScore, Math.floor(gameStates.score))}`, canvas.width / 2, canvas.height / 2 + 80, STYLES.text.GameOverScreenMessage);
         setHighScore(currentScore);
     }
-
-
 
     // 顯示狀態類：最高分
     drawText(ctx, `貓史上最高得分：${HighScore}`, canvas.width / 2, canvas.height / 2, STYLES.text.GameOverScreenMessage);

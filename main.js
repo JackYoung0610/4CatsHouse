@@ -1,6 +1,6 @@
 ﻿// 4CatsHouse - main.js
 // 版本號: 0.005
-export const gameVersion = 'v 0.007'
+export const gameVersion = 'v 0.008'
 
 import { resolutionScaleX, resolutionScaleY } from './js/constants.js';
 import { gameStates, mainCat, background,  objects } from './js/gameState.js';
@@ -119,10 +119,11 @@ function init_mainCat(bRandSelectCat=false) {
     const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
 
     selectedCat.x = canvas.width * 0.3;
-    selectedCat.y = background.floorY - (selectedCat.shape === 'circle' ? selectedCat.radius * 2 : selectedCat.height);
+    selectedCat.y = background.floorY - (selectedCat.shape === 'circle' ? selectedCat.radius  : selectedCat.height);
     selectedCat.velocityY = 0;
     selectedCat.isJumping = false;
 
+    console.log('init_mainCat selectedCat)',selectedCat);
 }
 
 // 初始化 物件
@@ -132,12 +133,12 @@ function init_objects(gameLevel = 0) {
     objects.length = 0;
 
     //初始化物件表
-    objects.push(createObject(ctx, canvas,'smallObstacle', objects, 100));
-    objects.push(createObject(ctx, canvas,'mediumObstacle', objects, 100));
-    objects.push(createObject(ctx, canvas,'largeObstacle', objects, 100));
-    objects.push(createObject(ctx, canvas,'greenCan', objects, 100));
-    objects.push(createObject(ctx, canvas,'blueCan', objects, 100));
-    objects.push(createObject(ctx, canvas,'goldCan', objects, 100));
+    objects.push(createObject(ctx, canvas,'smallObstacle', objects,));
+    objects.push(createObject(ctx, canvas,'mediumObstacle', objects, ));
+    objects.push(createObject(ctx, canvas,'largeObstacle', objects, ));
+    objects.push(createObject(ctx, canvas,'greenCan', objects,));
+    objects.push(createObject(ctx, canvas,'blueCan', objects, ));
+    objects.push(createObject(ctx, canvas,'goldCan', objects, ));
 
 }
 

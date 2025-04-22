@@ -5,7 +5,7 @@ import { gameStates, mainCat, background, objects } from './gameState.js';
 import { isColliding, isTooClose } from './utils.js';
 
 //包含所有與遊戲邏輯相關
-export function updateGameLogic(ctx, canvas) {
+export function updateGameLogic(ctx, gameCanvas) {
     // 更新遊戲速度
     const elapsedTimeInSeconds = gameStates.gameStartTime ? (Date.now() - gameStates.gameStartTime) / 1000 : 0;
     const timeBasedSpeedIncrease = Math.floor(elapsedTimeInSeconds / 10) * 0.1;
@@ -30,7 +30,7 @@ export function updateGameLogic(ctx, canvas) {
         if (object.x < -object.width) {
             const config = objectTypes[object.type];
             if (config && typeof config.generatePosition === 'function') {
-                const newPosition = config.generatePosition(canvas, background);
+                const newPosition = config.generatePosition(gameCanvas, background);
                 object.x = newPosition.x;
                 object.y = newPosition.y;
             }
@@ -38,7 +38,7 @@ export function updateGameLogic(ctx, canvas) {
 
         // 碰撞檢測
         if (isColliding(selectedCat, object)) {
-            handleCollision(ctx, canvas, object);
+            handleCollision(ctx, gameCanvas, object);
         }
       });
 
@@ -74,7 +74,7 @@ export function updateGameLogic(ctx, canvas) {
 }
 
 //處理物件的碰撞效果
-function handleCollision(ctx, canvas, object) {
+function handleCollision(ctx, gameCanvas, object) {
 
     switch (object.effect) {
         case 'addScore':
@@ -94,7 +94,7 @@ function handleCollision(ctx, canvas, object) {
     // 重新生成物件位置
     const config = objectTypes[object.type];
      if (config && typeof config.generatePosition === 'function') {
-         const newPosition = config.generatePosition(canvas, background);
+         const newPosition = config.generatePosition(gameCanvas, background);
          object.x = newPosition.x;
          object.y = newPosition.y;
      }
@@ -102,7 +102,7 @@ function handleCollision(ctx, canvas, object) {
 }
 
 //生成物件
-export function createObject(ctx, canvas, type, existingObjects, options = {}) {
+export function createObject(ctx, gameCanvas, type, existingObjects, options = {}) {
 
     const config = objectTypes[type];
     const { fixPositionX = null  ,fixPositionY = null , minDistanceX = 100, minDistanceY = 0 } = options;
@@ -121,7 +121,7 @@ export function createObject(ctx, canvas, type, existingObjects, options = {}) {
     const maxAttempts = 100;
 
    while (bIsTooClose && attempts < maxAttempts) {
-        position = config.generatePosition.call(config, canvas, background);
+        position = config.generatePosition.call(config, gameCanvas, background);
 
         // 檢查位置是否有效
         bIsTooClose = existingObjects.some(

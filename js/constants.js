@@ -1,5 +1,7 @@
 ﻿// constants.js
+
 // 遊戲的基礎設定
+export const HIGHSCORE = '4CatsHouseGameHighScore';
 
 //遊戲畫面縮放率
 export const resolutionScaleX = 0.7;
@@ -53,9 +55,9 @@ export const objectTypes = {
         
         yRandomSpread:50,
 
-        generatePosition: function (canvas, background) {
+        generatePosition: function (gameCanvas, background) {
                 return {
-                    x: canvas.width + Math.random() * canvas.width,
+                    x: gameCanvas.width + Math.random() * gameCanvas.width,
                     y: background.floorY  - this.height
                 };
         }
@@ -78,7 +80,7 @@ export const objectTypes = {
         
         yRandomSpread:30,
 
-        generatePosition: function (canvas, background) {
+        generatePosition: function (gameCanvas, background) {
 
             const randomRange = Math.random();
             let y;
@@ -91,7 +93,7 @@ export const objectTypes = {
                 y = background.floorY - (110 + Math.random() * this.yRandomSpread); // 範圍 3 
             }
             return {
-                x: canvas.width + Math.random() * canvas.width,
+                x: gameCanvas.width + Math.random() * gameCanvas.width,
                 y: y // 隨機高度
             };
         }
@@ -113,9 +115,9 @@ export const objectTypes = {
         
         yRandomSpread:50,
 
-         generatePosition: function (canvas, background) {
+         generatePosition: function (gameCanvas, background) {
                 return {
-                    x: canvas.width + Math.random() * canvas.width,
+                    x: gameCanvas.width + Math.random() * gameCanvas.width,
                     y: background.floorY  - this.height
                 };
         }
@@ -139,7 +141,7 @@ export const objectTypes = {
         
         yRandomSpread:40,
 
-        generatePosition: function (canvas, background) {
+        generatePosition: function (gameCanvas, background) {
 
             const randomRange = Math.random();
             let y;
@@ -152,7 +154,7 @@ export const objectTypes = {
                 y = background.floorY - (160 + Math.random() * this.yRandomSpread); // 範圍 3 
             }
             return {
-                x: canvas.width + Math.random() * canvas.width,
+                x: gameCanvas.width + Math.random() * gameCanvas.width,
                 y: y // 隨機高度
             };
         }
@@ -174,7 +176,7 @@ export const objectTypes = {
         
         yRandomSpread:30,
 
-        generatePosition: function (canvas, background) {
+        generatePosition: function (gameCanvas, background) {
             const randomRange = Math.random();
             let y;
 
@@ -186,7 +188,7 @@ export const objectTypes = {
                 y = background.floorY - (50 + Math.random() * this.yRandomSpread); // 範圍 3 
             }
             return {
-                x: canvas.width + Math.random() * canvas.width,
+                x: gameCanvas.width + Math.random() * gameCanvas.width,
                 y:y // 隨機高度
             };
         }
@@ -208,7 +210,7 @@ export const objectTypes = {
        
         yRandomSpread:20,
 
-        generatePosition: function (canvas, background) {
+        generatePosition: function (gameCanvas, background) {
             const randomRange = Math.random();
             let y;
 
@@ -220,7 +222,7 @@ export const objectTypes = {
                 y = background.floorY - (80 + Math.random() * this.yRandomSpread); // 範圍 3 
             }
             return {
-                x: canvas.width + Math.random() * canvas.width,
+                x: gameCanvas.width + Math.random() * gameCanvas.width,
                 y: y // 隨機高度
             };
         }

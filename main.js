@@ -1,6 +1,6 @@
 ﻿// 4CatsHouse - main.js
 // 版本號: 0.005
-export const gameVersion = 'v 0.008'
+export const gameVersion = 'v 0.009'
 
 import { resolutionScaleX, resolutionScaleY } from './js/constants.js';
 import { gameStates, mainCat, background,  objects } from './js/gameState.js';
@@ -12,23 +12,23 @@ import { updateGameLogic, createObject } from './js/gameLogic.js';
 export {  init_central };
 
 /**
- * 獲取 canvas 元素並檢查其是否存在。
+ * 獲取 gameCanvas 元素並檢查其是否存在。
  * @type {HTMLCanvasElement}
- * @throws {Error} 如果找不到具有 id "gameCanvas" 的 canvas 元素。
+ * @throws {Error} 如果找不到具有 id "gameCanvas" 的 gameCanvas 元素。
  */
-const canvas = document.getElementById('gameCanvas');
-if (!canvas) {
+const gameCanvas = document.getElementById('gameCanvas');
+if (!gameCanvas) {
     throw new Error('Canvas element with id "gameCanvas" not found.');
 }
 
 /**
- * 獲取 canvas 的 2D 繪圖上下文。
+ * 獲取 gameCanvas 的 2D 繪圖上下文。
  * @type {CanvasRenderingContext2D}
  * @throws {Error} 如果無法獲取 2D 繪圖上下文。
  */
-const ctx = canvas.getContext('2d');
+const ctx = gameCanvas.getContext('2d');
 if (!ctx) {
-    throw new Error('Failed to get 2D context for canvas.');
+    throw new Error('Failed to get 2D context for gameCanvas.');
 }
 
 
@@ -37,15 +37,15 @@ function init_central(options = {}) {
  
     const { bInitAll = false, 
                     // 初始化選項
-                    bInitCanvas = false, bInitGameStates = false,bInitBackgroud = false , bInitMainCat = false, bInitObjects = false,
+                    bInitGameCanvas = false, bInitGameStates = false,bInitBackgroud = false , bInitMainCat = false, bInitObjects = false,
 
                     bRandSelectCat = false 
 
                 } = options;
 
     // 初始化畫布
-    if (bInitAll || bInitCanvas){
-        init_canvas();
+    if (bInitAll || bInitGameCanvas){
+        init_gameCanvas();
     }
     // 初始化遊戲狀態
     if (bInitAll || bInitGameStates){
@@ -68,10 +68,10 @@ function init_central(options = {}) {
 
 
 // 初始化 遊戲畫布
-function init_canvas() {
-    // 設定 canvas 的寬度與高度
-    canvas.width = window.innerWidth * resolutionScaleX;
-    canvas.height = window.innerHeight * resolutionScaleY;
+function init_gameCanvas() {
+    // 設定 gameCanvas 的寬度與高度
+    gameCanvas.width = window.innerWidth * resolutionScaleX;
+    gameCanvas.height = window.innerHeight * resolutionScaleY;
 }
 
 // 初始化 遊戲狀態
@@ -83,7 +83,7 @@ function init_gameStates() {
     gameStates.timeLeft = 60;
 
     gameStates.isGameOver = false;
-    gameStates.gameState = 'start';
+    gameStates.currentGameState = 'mainMenu';
 
     gameStates.gameStartTime = null;
     // 清除之前的 interval
@@ -96,11 +96,11 @@ function init_gameStates() {
 // 初始化 背景
 function init_background() {
 
-    const floorHeight = canvas.height / 5;
-    const floorY = canvas.height - floorHeight;
+    const floorHeight = gameCanvas.height / 5;
+    const floorY = gameCanvas.height - floorHeight;
 
     // 初始化背景
-    background.width = canvas.width * 2;
+    background.width = gameCanvas.width * 2;
     background.x = 0;
     background.floorHeight = floorHeight;
     background.floorY = floorY;
@@ -118,7 +118,7 @@ function init_mainCat(bRandSelectCat=false) {
     // 設定小貓的初始位置
     const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
 
-    selectedCat.x = canvas.width * 0.3;
+    selectedCat.x = gameCanvas.width * 0.3;
     selectedCat.y = background.floorY - (selectedCat.shape === 'circle' ? selectedCat.radius  : selectedCat.height);
     selectedCat.velocityY = 0;
     selectedCat.isJumping = false;
@@ -133,12 +133,12 @@ function init_objects(gameLevel = 0) {
     objects.length = 0;
 
     //初始化物件表
-    objects.push(createObject(ctx, canvas,'smallObstacle', objects,));
-    objects.push(createObject(ctx, canvas,'mediumObstacle', objects, ));
-    objects.push(createObject(ctx, canvas,'largeObstacle', objects, ));
-    objects.push(createObject(ctx, canvas,'greenCan', objects,));
-    objects.push(createObject(ctx, canvas,'blueCan', objects, ));
-    objects.push(createObject(ctx, canvas,'goldCan', objects, ));
+    objects.push(createObject(ctx, gameCanvas,'smallObstacle', objects,));
+    objects.push(createObject(ctx, gameCanvas,'mediumObstacle', objects, ));
+    objects.push(createObject(ctx, gameCanvas,'largeObstacle', objects, ));
+    objects.push(createObject(ctx, gameCanvas,'greenCan', objects,));
+    objects.push(createObject(ctx, gameCanvas,'blueCan', objects, ));
+    objects.push(createObject(ctx, gameCanvas,'goldCan', objects, ));
 
 }
 
@@ -150,31 +150,35 @@ function init_objects(gameLevel = 0) {
  */
 function update() {
     try {
-        if (gameStates.gameState === 'start') {
-            // 繪製開始畫面
-            drawGamePhase_StartScreen(ctx, canvas);
-        
-            requestAnimationFrame(update);
+        // 根據目前的遊戲階段執行不同的邏輯
+        switch (gameStates.currentGameState) {
+            case 'mainMenu':
 
-            return;
-        }
-
-        // 檢查遊戲是否結束
-        if (gameStates.isGameOver) {
-            // 繪製背景與結算畫面
-            drawGamePhase_GameOver(ctx, canvas);
-        
-            requestAnimationFrame(update);
-
-            return;
-        }
-
-        // 更新遊戲邏輯
-        updateGameLogic(ctx, canvas);
-
-        // 繪製遊戲畫面
-        drawGamePhase_GameScene(ctx, canvas);
+                drawGamePhase_StartScreen(ctx, gameCanvas);
     
+                break;
+
+            case 'playing':
+
+                 // 更新遊戲邏輯
+                updateGameLogic(ctx, gameCanvas);
+
+                // 繪製遊戲畫面
+                 drawGamePhase_GameScene(ctx, gameCanvas);
+
+                break;
+
+            case 'gameOver':
+
+                // 繪製背景與結算畫面
+                drawGamePhase_GameOver(ctx, gameCanvas);
+
+                break;
+
+            default:
+                console.warn('Unknown game state:', gameStates.currentGameState);
+        }
+
         // 使用 requestAnimationFrame 繼續更新畫面
         requestAnimationFrame(update);
 
@@ -209,10 +213,10 @@ window.onerror = function (message, source, lineno, colno, error) {
 init_central( {bInitAll : true , bRandSelectCat : true});
 
 // 設置事件監聽器
-addEventListeners(ctx, canvas);
+addEventListeners(ctx, gameCanvas);
 
 update();
 
 //移除事件監聽器
-//removeEventListeners(ctx, canvas);
+//removeEventListeners(ctx, gameCanvas);
 

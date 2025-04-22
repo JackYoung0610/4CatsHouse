@@ -2,115 +2,168 @@
 
 import { gravity } from './constants.js';
 import { gameStates, mainCat, background } from './gameState.js';
-import { isInsideRectangle } from './utils.js';
+import { setHighScore, isInsideRectangle } from './utils.js';
 
 import { init_central } from '../main.js';
 
 
 //處理按下鍵盤
-export function procKeyDown(ctx, canvas, event) {
+export function procKeyDown(ctx, gameCanvas, event) {
     
-    const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
+    // 根據目前的遊戲階段執行不同的邏輯
+    switch (gameStates.currentGameState) {
+        case 'mainMenu':
 
-    if (gameStates.gameState === 'start'){
+            switch (event.code) {
+                case 'KeyC':
+                    // 清除最高分
+                    clearHighScore();
+                    break;
+                case 'Space':
+                    toPlaying();
+                    break;
 
-        //清除最高分
-        if (event.code === 'KeyC') {
-            clearHighScore();
-        } 
+                case 'Digit1':
+                case 'Digit2':
+                case 'Digit3':
+                case 'Digit4':
+                case 'Digit5':
+                    const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
+                    const digit =Math.max(Math.min(Math.abs(event.code.slice(5))-1, mainCat.allCats.length),0); 
+                    mainCat.currentCatIndex = digit ;
+                    break;
+                default:
+                    //nothing to do
+                    break;
+            }
+            break;
 
-        if (event.code === 'Digit1') { mainCat.currentCatIndex = 0; }
-        else if (event.code === 'Digit2') { mainCat.currentCatIndex = 1; }
-        else if (event.code === 'Digit3') { mainCat.currentCatIndex = 2; }
-        else if (event.code === 'Digit4') { mainCat.currentCatIndex = 3; }
-        else if (event.code === 'Digit5') { mainCat.currentCatIndex = 4; }
-        
-        if (event.code === 'Space'){
-            gamePlay();
-        }
+        case 'playing':
 
-    } else if (gameStates.isGameOver){
+            switch (event.code) {
+                    case 'Space':
+                        mainCatStartJump();
+                        break;
+                    default:
+                        //nothing to do
+                        break;
+                }
+            break;
 
-         if (event.code === 'KeyR') {
-            gameRePlay();
-          }else if (event.code === 'KeyB') {
-            gameToStart();
-           }
+        case 'gameOver':
 
-    }else if (gameStates.gameState === 'playing') {
+            switch (event.code) {
+                    case 'KeyR':
+                        toPlaying();
+                        break;
+                    case 'KeyM':
+                        toMainMenu();
+                        break;
+                    default:
+                        //nothing to do
+                        break;
+                }
+            break;
 
-        if (event.code === 'Space' && !selectedCat.isJumping) {
-            mainCatStartJump();
-        }
-
+        default:
+            console.warn('Unknown game state:', gameStates.currentGameState);
+            break;
     }
 
 }
 
 //處理放開鍵盤
-export function procKeyUp(ctx, canvas, event) {
+export function procKeyUp(ctx, gameCanvas, event) {
     
-    const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
+    // 根據目前的遊戲階段執行不同的邏輯
+    switch (gameStates.currentGameState) {
+        case 'mainMenu':
 
-    if (gameStates.gameState === 'start'){
+            break;
 
-        
-    } else if (gameStates.isGameOver){
+        case 'playing':
+             switch (event.code) {
+                case 'Space':
+                    mainCatEndJump();
+                    break;
+                default:
+                    //nothing to do
+                    break;
+            }
+            break;
 
-        
+        case 'gameOver':
 
-    }else if (gameStates.gameState === 'playing') {
-        if (event.code === 'Space') {
-            mainCatEndJump();
-        }
+            break;
+
+        default:
+            console.warn('Unknown game state:', gameStates.currentGameState);
+            break;
     }
-
+  
 }
 
 //處理點擊效果
-export function procClick(ctx, canvas, x, y) {
+export function procClick(ctx, gameCanvas, x, y) {
     
-    const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
+    // 根據目前的遊戲階段執行不同的邏輯
+    switch (gameStates.currentGameState) {
+        case 'mainMenu':
 
-    if (gameStates.gameState === 'start'){
+            // 檢查是否點擊到小貓
+            if (isClickInsideCat(ctx, gameCanvas, x, y)) {
+                cycleCat(); // 切換小貓
+            } else {
+                toPlaying(); // 未點擊小貓則進入遊戲
+            }
 
-        // 檢查是否點擊到小貓
-        if (isClickInsideCat(ctx, canvas, x, y)) {
-            cycleCat(); // 切換小貓
-        } else {
-            gamePlay(); // 未點擊小貓則進入遊戲
-        }
+            break;
 
-    } else if (gameStates.isGameOver){
+        case 'playing':
+             
+             mainCatStartJump();
 
-        // 檢查是否點擊到重新開始或回到主畫面按鈕
-        if (isInsideRectangle(x, y, canvas.restartButtonArea)) {
-            gameRePlay();
-        } else if (isInsideRectangle(x, y, canvas.backToStartButtonArea)) {
-            gameToStart();
-        }
+            break;
 
-    }else if (gameStates.gameState === 'playing') {
+        case 'gameOver':
 
-        if ( !selectedCat.isJumping) {
-            mainCatStartJump();
-        }
-        
+            // 檢查是否點擊到重新開始或回到主畫面按鈕
+            if (isInsideRectangle(x, y, gameCanvas.restartButtonArea)) {
+                toPlaying();
+            } else if (isInsideRectangle(x, y, gameCanvas.backToStartButtonArea)) {
+                toMainMenu();
+            }
+            break;
+
+        default:
+            console.warn('Unknown game state:', gameStates.currentGameState);
+            break;
     }
 
 }
 
 //處理放開點擊效果
-export function procRelease (ctx, canvas, x, y) {
+export function procRelease (ctx, gameCanvas, x, y) {
 
-    const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
+    // 根據目前的遊戲階段執行不同的邏輯
+    switch (gameStates.currentGameState) {
+        case 'mainMenu':
 
-    if (gameStates.gameState === 'start'){
-        
-    } else if (gameStates.isGameOver){
-        
-    }else if (gameStates.gameState === 'playing') {
-        mainCatEndJump();
+            break;
+
+        case 'playing':
+
+            mainCatEndJump();
+
+            break;
+
+        case 'gameOver':
+
+            break;
+
+        default:
+            console.warn('Unknown game state:', gameStates.currentGameState);
+            break;
     }
 
 }
@@ -122,13 +175,13 @@ export function procWindowResize(){
 
 
 // 檢查是否點擊到小貓
- function isClickInsideCat(ctx, canvas, x, y) {
+ function isClickInsideCat(ctx, gameCanvas, x, y) {
 
         const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
         // 計算小貓的中心點
         const padding = 10; // 擴大點擊範圍
-        const catCenterX = canvas.width / 2;
-        const catCenterY = canvas.height * 0.5;
+        const catCenterX = gameCanvas.width / 2;
+        const catCenterY = gameCanvas.height * 0.5;
 
         if (selectedCat.shape === 'rectangle') {
             return isInsideRectangle(x, y, {
@@ -154,37 +207,29 @@ function cycleCat() {
 }
 
 //回到主畫面
-function gameToStart() {
-    if (gameStates.isGameOver) {
-        init_central( {bInitAll : true , bRandSelectCat : true} );
-    }
+function toMainMenu() {
+
+    init_central( {bInitAll : true , bRandSelectCat : true} );
+
 }
 
 //進入遊戲
-function gamePlay() {
+function toPlaying() {
 
     init_central( {bInitAll : true} );
-    gameStates.gameState = 'playing';
+    gameStates.currentGameState = 'playing';
     startGameTimer(); // 開始計時器並記錄開始時間
-
-}
-
-//重新開始
-function gameRePlay() {
-
-    init_central( {bInitAll : true} );
-    gameStates.gameState = 'playing';
-    startGameTimer(); // 重新開始計時器並記錄開始時間
 
 }
 
 //開始計時
 function startGameTimer() {
     gameStates.gameInterval = setInterval(() => {
-        if (gameStates.gameState === 'playing' && !gameStates.isGameOver) {
+        if (gameStates.currentGameState === 'playing' && !gameStates.isGameOver) {
             gameStates.timeLeft -= 1;
             if (gameStates.timeLeft <= 0) {
                 gameStates.isGameOver = true;
+                gameStates.currentGameState = 'gameOver';;
                 clearInterval(gameStates.gameInterval); // 時間結束時清除 interval
             }
         }
@@ -218,7 +263,7 @@ function mainCatEndJump() {
 //將最高分清除為0
 function clearHighScore() {
 
-        localStorage.setItem('highScore', 0);
+        setHighScore(0);
         init_central( {bInitGameStates : true });
         console.log('Debug: 歷史最高分已重置為 0 (按下 C)');
 

@@ -1,4 +1,4 @@
-/* 4CatsHouse - style.css */
+﻿/* 4CatsHouse - style.css */
 /* 版本號: 0.002 */
 
 body {
@@ -11,9 +11,7 @@ body {
   min-height: 100vh;
 }
 
-canvas {
+#gameCanvas {
   display: block;
-  width: 70%; /* 設置畫布寬度 */
-  height: 70%; /* 設置畫布高度 */
   background-color: #ffffff; /* 畫布背景顏色 */
 }

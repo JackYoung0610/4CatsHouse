@@ -76,25 +76,25 @@ export function drawCircle(ctx, x, y, radius, options = {}) {
 /**
  * 繪製背景。
  * @param {CanvasRenderingContext2D} ctx - Canvas 2D 繪圖上下文。
- * @param {HTMLCanvasElement} canvas - Canvas 元素。
+ * @param {HTMLCanvasElement} gameCanvas - Canvas 元素。
   */
-export function drawBackground(ctx, canvas) {
+export function drawBackground(ctx, gameCanvas) {
 
     // 繪製背景
-    drawRectangle(ctx, background.x, 0, background.width, canvas.height, { fillColor: 'lightgreen' });
+    drawRectangle(ctx, background.x, 0, background.width, gameCanvas.height, { fillColor: 'lightgreen' });
 
     // 計算地板高度和位置
-    const floorHeight = canvas.height / 5;
-    const floorY = canvas.height - floorHeight;
+    const floorHeight = gameCanvas.height / 5;
+    const floorY = gameCanvas.height - floorHeight;
 
-    drawRectangle(ctx, 0, floorY, canvas.width, floorHeight, { fillColor: 'dimgray' });
+    drawRectangle(ctx, 0, floorY, gameCanvas.width, floorHeight, { fillColor: 'dimgray' });
 
     // 更新背景物件的地板屬性
     background.floorHeight = floorHeight;
     background.floorY = floorY;
 
     // 繪製地板
-    drawRectangle(ctx, 0, floorY, canvas.width, floorHeight, { fillColor: 'dimgray' });
+    drawRectangle(ctx, 0, floorY, gameCanvas.width, floorHeight, { fillColor: 'dimgray' });
 }
 
 
@@ -118,30 +118,30 @@ export function drawCat(ctx) {
 }
 
 //繪製分數與時間
-export function drawScoreAndTime(ctx, canvas) {
+export function drawScoreAndTime(ctx, gameCanvas) {
     drawText(ctx,`最高分: ${gameStates.highScore}`, 10, 20, STYLES.text.GameScreenStatus);
     drawText(ctx,`分數: ${Math.floor(gameStates.score)}`, 10, 40, STYLES.text.GameScreenStatus);
     const displayedTime = Math.max(0, gameStates.timeLeft);
-    drawText(ctx,`時間: ${displayedTime}`, canvas.width - 80, 20, STYLES.text.GameScreenStatus);
+    drawText(ctx,`時間: ${displayedTime}`, gameCanvas.width - 80, 20, STYLES.text.GameScreenStatus);
 }
 
 /**
  * 繪製開始畫面。
  * @param {CanvasRenderingContext2D} ctx - Canvas 2D 繪圖上下文。
- * @param {HTMLCanvasElement} canvas - Canvas 元素。
+ * @param {HTMLCanvasElement} gameCanvas - Canvas 元素。
  * @param {Object} gameStates - 遊戲狀態物件。
  * @param {Object} cat - 控制的貓咪，包含位置、形狀、顏色等資訊。
  */
-export function drawGamePhase_StartScreen(ctx, canvas) {
+export function drawGamePhase_StartScreen(ctx, gameCanvas) {
 
     // 清除畫布
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
     // 繪製背景
-    drawRectangle(ctx, 0, 0, canvas.width, canvas.height, { fillColor: 'lightblue' });
+    drawRectangle(ctx, 0, 0, gameCanvas.width, gameCanvas.height, { fillColor: 'lightblue' });
 
     // 繪製標題
-    drawText(ctx, '4CatsHouse', canvas.width / 2, canvas.height * 0.3, STYLES.text.StartScreenMainTitle);
+    drawText(ctx, '4CatsHouse', gameCanvas.width / 2, gameCanvas.height * 0.3, STYLES.text.StartScreenMainTitle);
 
     //繪製最高分
     drawText(ctx, `最高分: ${gameStates.highScore}`, 10, 20, STYLES.text.StartScreenStatus);
@@ -149,33 +149,33 @@ export function drawGamePhase_StartScreen(ctx, canvas) {
     //設定小貓位置並繪製
     const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
     if (selectedCat.shape === 'rectangle') {
-         selectedCat.x = (canvas.width * 0.5) - (selectedCat.width * 0.5);
-        selectedCat.y = (canvas.height * 0.5) - (selectedCat.height * 0.8) ;
+         selectedCat.x = (gameCanvas.width * 0.5) - (selectedCat.width * 0.5);
+        selectedCat.y = (gameCanvas.height * 0.5) - (selectedCat.height * 0.8) ;
     } else if (selectedCat.shape === 'circle') {
-        selectedCat.x = (canvas.width * 0.5) ;
-        selectedCat.y = (canvas.height * 0.5) - (selectedCat.radius *0.8);
+        selectedCat.x = (gameCanvas.width * 0.5) ;
+        selectedCat.y = (gameCanvas.height * 0.5) - (selectedCat.radius *0.8);
     }
     drawCat(ctx);
 
-    drawText(ctx, selectedCat.name, canvas.width / 2, canvas.height * 0.6, { font: '20px sans-serif', color: 'white', textAlign: 'center' });
-    drawText(ctx, '點擊後開始用餐', canvas.width / 2, canvas.height * 0.7, STYLES.text.StartScreenButton);
-    drawText(ctx, gameVersion , canvas.width - 50 , canvas.height - 10, STYLES.text.StartScreenButton);
+    drawText(ctx, selectedCat.name, gameCanvas.width / 2, gameCanvas.height * 0.6, { font: '20px sans-serif', color: 'white', textAlign: 'center' });
+    drawText(ctx, '點擊後開始用餐', gameCanvas.width / 2, gameCanvas.height * 0.7, STYLES.text.StartScreenButton);
+    drawText(ctx, gameVersion , gameCanvas.width - 50 , gameCanvas.height - 10, STYLES.text.StartScreenButton);
 
 }
 
 /**
  * 繪製遊戲畫面。
  * @param {CanvasRenderingContext2D} ctx - Canvas 2D 繪圖上下文。
- * @param {HTMLCanvasElement} canvas - Canvas 元素。
+ * @param {HTMLCanvasElement} gameCanvas - Canvas 元素。
  * @param {Function} drawScoreAndTime - 繪製分數與時間的函式。
  */
-export function drawGamePhase_GameScene(ctx, canvas) {
+export function drawGamePhase_GameScene(ctx, gameCanvas) {
     
     // 清除畫布
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
     // 繪製背景
-    drawBackground(ctx, canvas, background);
+    drawBackground(ctx, gameCanvas, background);
 
     // 繪製遊戲物件
     objects.forEach((object) => {
@@ -189,29 +189,29 @@ export function drawGamePhase_GameScene(ctx, canvas) {
     // 繪製貓咪
     drawCat(ctx);
     // 繪製分數與時間
-    drawScoreAndTime(ctx, canvas);
+    drawScoreAndTime(ctx, gameCanvas);
 
 }
 
 /**
  * 繪製結算畫面。
  * @param {CanvasRenderingContext2D} ctx - Canvas 2D 繪圖上下文。
- * @param {HTMLCanvasElement} canvas - Canvas 元素。
+ * @param {HTMLCanvasElement} gameCanvas - Canvas 元素。
  */
-export function drawGamePhase_GameOver(ctx, canvas) {
+export function drawGamePhase_GameOver(ctx, gameCanvas) {
 
     // 清除畫布
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
-    drawRectangle(ctx, 0, 0, canvas.width, canvas.height, { fillColor: 'black' });
+    drawRectangle(ctx, 0, 0, gameCanvas.width, gameCanvas.height, { fillColor: 'black' });
 
     const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
     const HighScore = gameStates.highScore;
     const currentScore = gameStates.score
     let congratsMessage = '';
 
-    drawText(ctx, '用餐時間結束囉', canvas.width / 2, canvas.height / 2 - 80, STYLES.text.GameOverScreenMessage);
-    drawText(ctx, `${selectedCat.name} 得到的分數：${Math.floor(gameStates.score)}`, canvas.width / 2, canvas.height / 2 - 40, STYLES.text.GameOverScreenMessage);
+    drawText(ctx, '用餐時間結束囉', gameCanvas.width / 2, gameCanvas.height / 2 - 80, STYLES.text.GameOverScreenMessage);
+    drawText(ctx, `${selectedCat.name} 得到的分數：${Math.floor(gameStates.score)}`, gameCanvas.width / 2, gameCanvas.height / 2 - 40, STYLES.text.GameOverScreenMessage);
 
     if (Math.floor(currentScore) < Math.floor(HighScore)) {
         // 如果當前分數小於最高分，顯示鼓勵訊息
@@ -224,22 +224,22 @@ export function drawGamePhase_GameOver(ctx, canvas) {
     } else if  (Math.floor(currentScore) > Math.floor(HighScore)) {
         // 如果當前分數大於最高分，顯示鼓勵訊息
         congratsMessage = `太棒啦，${selectedCat.name} 果然是能創造奇蹟的！`;
-        drawText(ctx, `全新的最高得分為：${Math.max(gameStates.highScore, Math.floor(gameStates.score))}`, canvas.width / 2, canvas.height / 2 + 80, STYLES.text.GameOverScreenMessage);
+        drawText(ctx, `全新的最高得分為：${Math.max(gameStates.highScore, Math.floor(gameStates.score))}`, gameCanvas.width / 2, gameCanvas.height / 2 + 80, STYLES.text.GameOverScreenMessage);
         setHighScore(currentScore);
     }
 
     // 顯示狀態類：最高分
-    drawText(ctx, `貓史上最高得分：${HighScore}`, canvas.width / 2, canvas.height / 2, STYLES.text.GameOverScreenMessage);
+    drawText(ctx, `貓史上最高得分：${HighScore}`, gameCanvas.width / 2, gameCanvas.height / 2, STYLES.text.GameOverScreenMessage);
     // 結算訊息類：提示訊息
-    drawText(ctx, congratsMessage, canvas.width / 2, canvas.height / 2 + 40, STYLES.text.GameOverScreenMessage);
+    drawText(ctx, congratsMessage, gameCanvas.width / 2, gameCanvas.height / 2 + 40, STYLES.text.GameOverScreenMessage);
 
     // 按鈕類：重新再用餐
-    canvas.restartButtonArea = calculateButtonArea(ctx, canvas.width * 0.25, canvas.height * 0.8, '重新再用餐');
-    drawText(ctx, '重新再用餐', canvas.width * 0.25, canvas.height * 0.8, STYLES.text.GameOverScreenButton);
+    gameCanvas.restartButtonArea = calculateButtonArea(ctx, gameCanvas.width * 0.25, gameCanvas.height * 0.8, '重新再用餐');
+    drawText(ctx, '重新再用餐', gameCanvas.width * 0.25, gameCanvas.height * 0.8, STYLES.text.GameOverScreenButton);
 
     // 按鈕類：回到主畫面
-    canvas.backToStartButtonArea = calculateButtonArea(ctx, canvas.width * 0.75, canvas.height * 0.8, '回到主畫面');
-    drawText(ctx, '回到主畫面', canvas.width * 0.75, canvas.height * 0.8, STYLES.text.GameOverScreenButton);
+    gameCanvas.backToStartButtonArea = calculateButtonArea(ctx, gameCanvas.width * 0.75, gameCanvas.height * 0.8, '回到主畫面');
+    drawText(ctx, '回到主畫面', gameCanvas.width * 0.75, gameCanvas.height * 0.8, STYLES.text.GameOverScreenButton);
 
 }
 

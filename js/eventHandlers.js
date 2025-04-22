@@ -4,21 +4,21 @@ import { procKeyDown, procKeyUp, procClick, procRelease, procWindowResize } from
 
 /**
  * 註冊所有的事件監聽器。
- * @param {HTMLCanvasElement} canvas - 遊戲的 canvas 元素。
+ * @param {HTMLCanvasElement} gameCanvas - 遊戲的 gameCanvas 元素。
  */
-export function addEventListeners(ctx, canvas) {
+export function addEventListeners(ctx, gameCanvas) {
 
     // 鍵盤事件
-    document.addEventListener('keydown', (event) => handleKeyDown(ctx, canvas, event));
-    document.addEventListener('keyup', (event) => handleKeyUp(ctx, canvas, event,));
+    document.addEventListener('keydown', (event) => handleKeyDown(ctx, gameCanvas, event));
+    document.addEventListener('keyup', (event) => handleKeyUp(ctx, gameCanvas, event,));
 
     // 滑鼠事件
-    canvas.addEventListener('mousedown', (event) => handleMouseDown(ctx, canvas, event));
-    canvas.addEventListener('mouseup', (event) => handleMouseUp(ctx, canvas, event));
+    gameCanvas.addEventListener('mousedown', (event) => handleMouseDown(ctx, gameCanvas, event));
+    gameCanvas.addEventListener('mouseup', (event) => handleMouseUp(ctx, gameCanvas, event));
 
     // 觸控事件
-    canvas.addEventListener('touchstart', (event) => handleTouchStart(ctx, canvas, event), false);
-    canvas.addEventListener('touchend', (event) => handleTouchEnd(ctx, canvas, event), false);
+    gameCanvas.addEventListener('touchstart', (event) => handleTouchStart(ctx, gameCanvas, event), false);
+    gameCanvas.addEventListener('touchend', (event) => handleTouchEnd(ctx, gameCanvas, event), false);
 
     // 監聽視窗大小改變事件
     window.addEventListener('resize', handleWindowResize);
@@ -26,11 +26,11 @@ export function addEventListeners(ctx, canvas) {
 
 /**
  * 移除所有的事件監聽器。
- * @param {HTMLCanvasElement} canvas - 遊戲的 canvas 元素。
+ * @param {HTMLCanvasElement} gameCanvas - 遊戲的 gameCanvas 元素。
  */
-export function removeEventListeners(ctx, canvas) {
-    // 確保 canvas 存在
-    if (!canvas) {
+export function removeEventListeners(ctx, gameCanvas) {
+    // 確保 gameCanvas 存在
+    if (!gameCanvas) {
         throw new Error('Canvas is not defined.');
     }
 
@@ -39,63 +39,63 @@ export function removeEventListeners(ctx, canvas) {
     document.removeEventListener('keyup', handleKeyUp);
 
     // 滑鼠事件
-    canvas.removeEventListener('mousedown', handleMouseDown);
-    canvas.removeEventListener('mouseup', handleMouseUp);
+    gameCanvas.removeEventListener('mousedown', handleMouseDown);
+    gameCanvas.removeEventListener('mouseup', handleMouseUp);
 
     // 觸控事件
-    canvas.removeEventListener('touchstart', handleTouchStart, false);
-    canvas.removeEventListener('touchend', handleTouchEnd, false);
+    gameCanvas.removeEventListener('touchstart', handleTouchStart, false);
+    gameCanvas.removeEventListener('touchend', handleTouchEnd, false);
 
     // 視窗大小改變事件
     window.removeEventListener('resize', handleWindowResize);
 }
 
 // 鍵盤事件
-function handleKeyDown(ctx, canvas, event) {
+function handleKeyDown(ctx, gameCanvas, event) {
     
-    procKeyDown(ctx, canvas, event);
+    procKeyDown(ctx, gameCanvas, event);
 
 }
 
-function handleKeyUp(ctx, canvas, event) {
+function handleKeyUp(ctx, gameCanvas, event) {
 
-    procKeyUp(ctx, canvas, event);
+    procKeyUp(ctx, gameCanvas, event);
 
 }
 
 // 滑鼠事件
-function handleMouseDown(ctx, canvas, event) {
-    const rect = canvas.getBoundingClientRect();
+function handleMouseDown(ctx, gameCanvas, event) {
+    const rect = gameCanvas.getBoundingClientRect();
     const clickX = event.clientX - rect.left;
     const clickY = event.clientY - rect.top;
-    procClick(ctx, canvas, clickX, clickY);
+    procClick(ctx, gameCanvas, clickX, clickY);
 }
 
-function handleMouseUp(ctx, canvas, event) {
-    const rect = canvas.getBoundingClientRect();
+function handleMouseUp(ctx, gameCanvas, event) {
+    const rect = gameCanvas.getBoundingClientRect();
     const releaseX = event.clientX - rect.left;
     const releaseY= event.clientY - rect.top;
-    procRelease(ctx, canvas, releaseX, releaseY);
+    procRelease(ctx, gameCanvas, releaseX, releaseY);
 }
 
 // 觸控事件
-function handleTouchStart(ctx, canvas, event) {
+function handleTouchStart(ctx, gameCanvas, event) {
     event.preventDefault();
     const touch = event.touches[0];
-    const rect = canvas.getBoundingClientRect();
+    const rect = gameCanvas.getBoundingClientRect();
     const touchX = touch.clientX - rect.left;
     const touchY = touch.clientY - rect.top;
-    procClick(ctx, canvas, touchX, touchY);
+    procClick(ctx, gameCanvas, touchX, touchY);
 }
 
-function handleTouchEnd(ctx, canvas, event) {
+function handleTouchEnd(ctx, gameCanvas, event) {
     event.preventDefault();
     if (event.touches.length > 0) {
         const touch = event.touches[0];
-        const rect = canvas.getBoundingClientRect();
+        const rect = gameCanvas.getBoundingClientRect();
         const releaseX = touch.clientX - rect.left;
         const releaseY = touch.clientY - rect.top;
-        procRelease(ctx, canvas, releaseX, releaseY);
+        procRelease(ctx, gameCanvas, releaseX, releaseY);
     }else {
         console.log("Debug: No active touches on touchend.");
     }

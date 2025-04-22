@@ -14,7 +14,7 @@ export const gameStates = {
 
     // 遊戲狀態
     isGameOver : false,
-    gameState :  'start' // 'start', 'playing', 'gameOver'
+    currentGameState :  'mainMenu' // 'mainMenu', 'playing', 'gameOver'
 };
 
 // 貓咪角色資料

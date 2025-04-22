@@ -1,8 +1,8 @@
 ﻿// 4CatsHouse - main.js
 // 版本號: 0.005
-export const gameVersion = 'v 0.009'
+export const gameVersion = 'v 0.010'
 
-import { resolutionScaleX, resolutionScaleY } from './js/constants.js';
+import { gameDisplay } from './js/constants.js';
 import { gameStates, mainCat, background,  objects } from './js/gameState.js';
 import { getHighScore,  calculateButtonArea } from './js/utils.js';
 import { addEventListeners, removeEventListeners } from './js/eventHandlers.js';
@@ -70,8 +70,12 @@ function init_central(options = {}) {
 // 初始化 遊戲畫布
 function init_gameCanvas() {
     // 設定 gameCanvas 的寬度與高度
-    gameCanvas.width = window.innerWidth * resolutionScaleX;
-    gameCanvas.height = window.innerHeight * resolutionScaleY;
+    gameCanvas.width = window.innerWidth * gameDisplay.resolutionScaleX;
+    gameCanvas.height = window.innerHeight * gameDisplay.resolutionScaleY;
+
+    // 設定 縮放倍率
+    gameDisplay.scaleX = gameCanvas.width / gameDisplay.BASE_WIDTH;
+    gameDisplay.scaleY = gameCanvas.height / gameDisplay.BASE_HEIGHT;
 }
 
 // 初始化 遊戲狀態
@@ -96,14 +100,11 @@ function init_gameStates() {
 // 初始化 背景
 function init_background() {
 
-    const floorHeight = gameCanvas.height / 5;
-    const floorY = gameCanvas.height - floorHeight;
-
     // 初始化背景
     background.width = gameCanvas.width * 2;
     background.x = 0;
-    background.floorHeight = floorHeight;
-    background.floorY = floorY;
+    background.floorHeight = gameCanvas.height / 5;
+    background.floorY = gameCanvas.height - background.floorHeight;
 
 }
 
@@ -123,7 +124,7 @@ function init_mainCat(bRandSelectCat=false) {
     selectedCat.velocityY = 0;
     selectedCat.isJumping = false;
 
-    console.log('init_mainCat selectedCat)',selectedCat);
+    //console.log('init_mainCat selectedCat)',selectedCat);
 }
 
 // 初始化 物件

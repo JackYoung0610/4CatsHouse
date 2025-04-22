@@ -170,7 +170,7 @@ export function procRelease (ctx, gameCanvas, x, y) {
 
 //處理視窗大小變化
 export function procWindowResize(){
-    init_central( {bInitCanvas : true ,  bInitBackgroud : true, bInitMainCat : true});
+    init_central( {bInitGameCanvas : true ,  bInitBackgroud : true, bInitMainCat : true});
 }
 
 

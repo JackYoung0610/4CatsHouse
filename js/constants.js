@@ -4,8 +4,19 @@
 export const HIGHSCORE = '4CatsHouseGameHighScore';
 
 //遊戲畫面縮放率
-export const resolutionScaleX = 0.7;
-export const resolutionScaleY = 0.7;
+
+export const gameDisplay ={
+ 
+     BASE_WIDTH : 1920,
+     BASE_HEIGHT : 1080,
+ 
+     resolutionScaleX : 0.9,
+     resolutionScaleY : 0.9,
+ 
+     scaleX : 1,
+     scaleY : 1,
+ 
+ }
 
 // 定義重力常數，用於控制跳躍物理效果
 export const gravity = 0.01;

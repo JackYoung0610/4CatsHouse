@@ -64,12 +64,15 @@ export const objectTypes = {
         fillColor: 'rgba(250, 0, 0, 1)', 
         strokeColor:'white',
         
+        currentXScalex : 0,
+        currentYScalex : 0,
+
         yRandomSpread:50,
 
         generatePosition: function (gameCanvas, background) {
                 return {
                     x: gameCanvas.width + Math.random() * gameCanvas.width,
-                    y: background.floorY  - this.height
+                    y: background.floorY  - (this.height * gameDisplay.scaleY)
                 };
         }
     },
@@ -89,6 +92,9 @@ export const objectTypes = {
         fillColor: 'rgba(250, 0, 0, 1)', 
         strokeColor: 'white', 
         
+        currentXScalex : 0,
+        currentYScalex : 0,
+
         yRandomSpread:30,
 
         generatePosition: function (gameCanvas, background) {
@@ -97,11 +103,11 @@ export const objectTypes = {
             let y;
 
             if (randomRange < 0.60) { 
-                y = background.floorY - (40 + Math.random() * this.yRandomSpread); // 範圍 1
+                y = background.floorY - ((40 + Math.random() * this.yRandomSpread)  * gameDisplay.scaleY); // 範圍 1
             } else if (randomRange < 0.90) {
-                y = background.floorY - (70 + Math.random() * this.yRandomSpread); // 範圍 2 
+                y = background.floorY - ((70 + Math.random() * this.yRandomSpread)  * gameDisplay.scaleY); // 範圍 2 
             } else { 
-                y = background.floorY - (110 + Math.random() * this.yRandomSpread); // 範圍 3 
+                y = background.floorY - ((110 + Math.random() * this.yRandomSpread)  * gameDisplay.scaleY); // 範圍 3 
             }
             return {
                 x: gameCanvas.width + Math.random() * gameCanvas.width,
@@ -119,6 +125,9 @@ export const objectTypes = {
         height: 60,
         radius: 40, 
 
+        currentXScalex : 0,
+        currentYScalex : 0,
+
         speedBonus:0,
 
         fillColor: 'rgba(250, 0, 0, 1)', 
@@ -129,7 +138,7 @@ export const objectTypes = {
          generatePosition: function (gameCanvas, background) {
                 return {
                     x: gameCanvas.width + Math.random() * gameCanvas.width,
-                    y: background.floorY  - this.height
+                    y: background.floorY  - (this.height * gameDisplay.scaleY)
                 };
         }
     },
@@ -150,6 +159,9 @@ export const objectTypes = {
         fillColor: 'rgba(164, 251, 135, 1)', 
         strokeColor: 'white',
         
+        currentXScalex : 0,
+        currentYScalex : 0,
+
         yRandomSpread:40,
 
         generatePosition: function (gameCanvas, background) {
@@ -158,11 +170,11 @@ export const objectTypes = {
             let y;
 
             if (randomRange < 0.70) { 
-                y = background.floorY - (40 + Math.random() * this.yRandomSpread); // 範圍 1
+                y = background.floorY - ((40 + Math.random() * this.yRandomSpread) * gameDisplay.scaleY); // 範圍 1
             } else if (randomRange < 0.90) {
-                y = background.floorY - (100 + Math.random() * this.yRandomSpread); // 範圍 2 
+                y = background.floorY - ((100 + Math.random() * this.yRandomSpread) * gameDisplay.scaleY); // 範圍 2 
             } else { 
-                y = background.floorY - (160 + Math.random() * this.yRandomSpread); // 範圍 3 
+                y = background.floorY - ((160 + Math.random() * this.yRandomSpread) * gameDisplay.scaleY); // 範圍 3 
             }
             return {
                 x: gameCanvas.width + Math.random() * gameCanvas.width,
@@ -185,6 +197,9 @@ export const objectTypes = {
         fillColor: 'rgba(30, 70, 192, 1)',
         strokeColor: 'white',
         
+        currentXScalex : 0,
+        currentYScalex : 0,
+
         yRandomSpread:30,
 
         generatePosition: function (gameCanvas, background) {
@@ -192,11 +207,11 @@ export const objectTypes = {
             let y;
 
             if (randomRange < 0.80) { 
-                y = background.floorY - (75 + Math.random() * this.yRandomSpread); // 範圍 1
+                y = background.floorY - ((75 + Math.random() * this.yRandomSpread) * gameDisplay.scaleY); // 範圍 1
             } else if (randomRange < 0.90) {
-                y = background.floorY - (150 + Math.random() * this.yRandomSpread); // 範圍 2 
+                y = background.floorY - ((150 + Math.random() * this.yRandomSpread)  * gameDisplay.scaleY); // 範圍 2 
             } else { 
-                y = background.floorY - (50 + Math.random() * this.yRandomSpread); // 範圍 3 
+                y = background.floorY - ((50 + Math.random() * this.yRandomSpread) *  gameDisplay.scaleY); // 範圍 3 
             }
             return {
                 x: gameCanvas.width + Math.random() * gameCanvas.width,
@@ -219,6 +234,9 @@ export const objectTypes = {
         fillColor: 'rgba(255, 215, 0, 1)',
         strokeColor: 'white',
        
+        currentXScalex : 0,
+        currentYScalex : 0,
+
         yRandomSpread:20,
 
         generatePosition: function (gameCanvas, background) {
@@ -226,11 +244,11 @@ export const objectTypes = {
             let y;
 
             if (randomRange < 0.80) { 
-                y = background.floorY - (180 + Math.random() * this.yRandomSpread); // 範圍 1
+                y = background.floorY - ((180 + Math.random() * this.yRandomSpread)* gameDisplay.scaleY); // 範圍 1
             } else if (randomRange < 0.95) {
-                y = background.floorY - (130 + Math.random() * this.yRandomSpread); // 範圍 2 
+                y = background.floorY - ((130 + Math.random() * this.yRandomSpread)* gameDisplay.scaleY); // 範圍 2 
             } else { 
-                y = background.floorY - (80 + Math.random() * this.yRandomSpread); // 範圍 3 
+                y = background.floorY - ((80 + Math.random() * this.yRandomSpread)); // 範圍 3 
             }
             return {
                 x: gameCanvas.width + Math.random() * gameCanvas.width,

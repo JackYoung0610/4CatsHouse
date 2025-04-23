@@ -1,4 +1,7 @@
 ﻿// gameState.js
+
+import { gameDisplay } from './constants.js';
+
 // 管理遊戲的全域狀態與變數
 
 export const gameStates = {
@@ -6,6 +9,8 @@ export const gameStates = {
     score : 0,
     highScore : 0,
     timeLeft : 60,
+
+    gameLevel : 0,
 
     gameInterval:null, // 用於儲存 setInterval 的 ID
     gameStartTime:null , // 用於儲存遊戲開始的時間
@@ -18,12 +23,14 @@ export const gameStates = {
 };
 
 // 貓咪角色資料
-export const mainCat = { currentCatIndex : 0,  allCats :[
-    { name: '冰炫風',      fillColor: 'rgba(51, 149, 255, 1)',     strokeColor:'white',    width: 100,  height: 50,       radius: 0,      shape: 'rectangle' ,    isJumping: false,     jumpHeight: 220,      catGravity:0,    velocityY:0,       x:  0.3,    y: 0,},
-    { name: '醬太郎',      fillColor: 'rgba(255, 150, 33, 1)',     strokeColor:'white',    width: 35,  height: 35,       radius: 35,     shape: 'circle',               isJumping: false,     jumpHeight: 220,       catGravity:0.15,     velocityY:0,      x:  0.3,    y: 0,},
-    { name: '牛奶糖',      fillColor: 'rgba(255, 255, 255, 1)',    strokeColor:'black',     width: 120, height: 55,       radius: 0,     shape: 'rectangle',     isJumping: false,      jumpHeight: 240,      catGravity:0.04,       velocityY:0,        x:  0.3,     y: 0,},
-    { name: '青草茶',      fillColor: 'rgba(0, 0, 0, 1)',                  strokeColor:'white',    width: 100,  height: 70,       radius: 0,     shape: 'rectangle',     isJumping: false,      jumpHeight: 250,      catGravity:0.09,     velocityY:0,        x:  0.3,     y: 0,},
-    { name: '炸豬排',      fillColor: 'rgba(251, 135, 210, 1)',    strokeColor:'white',    width: 30,  height: 30,       radius: 20,     shape: 'circle',                isJumping: false,     jumpHeight: 200,       catGravity:0.02,    velocityY:0,        x:  0.3,     y: 0, }
+export const mainCat = { currentCatIndex : 0,  
+    currentCat : [],
+    allCats :[
+        { name: '冰炫風',      fillColor: 'rgba(51, 149, 255, 1)',     strokeColor:'white',    width: 100  ,  height: 50  ,       radius: 0,      shape: 'rectangle' ,    isJumping: false,     jumpHeight: 220,      catGravity:0,    velocityY:0,       x:  0.3,    y: 0, currentYScalex : 0},
+        { name: '醬太郎',      fillColor: 'rgba(255, 150, 33, 1)',     strokeColor:'white',    width: 35,  height: 35,       radius: 35,     shape: 'circle',               isJumping: false,     jumpHeight: 220,       catGravity:0.15,     velocityY:0,      x:  0.3,    y: 0, currentYScalex : 0},
+        { name: '牛奶糖',      fillColor: 'rgba(255, 255, 255, 1)',    strokeColor:'black',     width: 120, height: 55,       radius: 0,     shape: 'rectangle',     isJumping: false,      jumpHeight: 240,      catGravity:0.04,       velocityY:0,        x:  0.3,     y: 0, currentYScalex : 0},
+        { name: '青草茶',      fillColor: 'rgba(0, 0, 0, 1)',                  strokeColor:'white',    width: 100,  height: 70,       radius: 0,     shape: 'rectangle',     isJumping: false,      jumpHeight: 250,      catGravity:0.09,     velocityY:0,        x:  0.3,     y: 0, currentYScalex : 0},
+        { name: '炸豬排',      fillColor: 'rgba(251, 135, 210, 1)',    strokeColor:'white',    width: 30,  height: 30,       radius: 20,     shape: 'circle',                isJumping: false,     jumpHeight: 200,       catGravity:0.02,    velocityY:0,        x:  0.3,     y: 0,currentYScalex : 0 }
     ],
 }
 

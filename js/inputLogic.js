@@ -3,8 +3,10 @@
 import { gravity } from './constants.js';
 import { gameStates, mainCat, background } from './gameState.js';
 import { setHighScore, isInsideRectangle } from './utils.js';
+import { mainCatStartJump, mainCatEndJump } from './gameLogic.js';
 
 import { init_central } from '../main.js';
+
 
 
 //處理按下鍵盤
@@ -170,7 +172,15 @@ export function procRelease (ctx, gameCanvas, x, y) {
 
 //處理視窗大小變化
 export function procWindowResize(){
-    init_central( {bInitGameCanvas : true ,  bInitBackgroud : true, bInitMainCat : true});
+
+    init_central( {bInitGameCanvas : true ,  
+
+                            bInitBackgroud : true, 
+
+                            bInitMainCat : true, bKeepMainCat:true,
+
+                            bInitObjects:true, bKeepObjects : true});
+
 }
 
 
@@ -237,28 +247,6 @@ function startGameTimer() {
     gameStates.gameStartTime = Date.now(); // 記錄遊戲開始的確切時間
 }
 
-//小貓起跳
- function mainCatStartJump() {
-
-    const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
-
-    if (!selectedCat.isJumping) {
-        selectedCat.isJumping = true;
-        selectedCat.velocityY = -Math.sqrt(2 * gravity * selectedCat.jumpHeight); // 根據跳躍高度計算初速度
-    }
-
-}
-
-//小貓落下
-function mainCatEndJump() {
-
-    const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
-
-    if (selectedCat.isJumping && selectedCat.velocityY < 0) {
-        selectedCat.velocityY = 0;
-    }
-
-}
 
 //將最高分清除為0
 function clearHighScore() {

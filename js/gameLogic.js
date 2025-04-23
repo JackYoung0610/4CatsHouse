@@ -1,6 +1,6 @@
 ﻿// gameLogic.js
 
-import { gravity, baseGameSpeed, objectTypes} from './constants.js';
+import { gameDisplay, gravity, baseGameSpeed, objectTypes} from './constants.js';
 import { gameStates, mainCat, background, objects } from './gameState.js';
 import { isColliding, isTooClose } from './utils.js';
 
@@ -22,9 +22,10 @@ export function updateGameLogic(ctx, gameCanvas) {
 
     // 更新物件位置與碰撞檢測
     objects.forEach((object) => {
-        const objectSpeed = gameSpeed + object.speedBonus;
+        const objectSpeed = ( gameSpeed + object.speedBonus ) * gameDisplay.scaleX;
 
         object.x -= objectSpeed ;
+        object.currentXScalex = object.x / gameCanvas.width;
 
         // 如果物件超出畫面，重新生成位置
         if (object.x < -object.width) {
@@ -44,33 +45,60 @@ export function updateGameLogic(ctx, gameCanvas) {
 
 
     // 小貓跳躍邏輯
+    const groundLevel = background.floorY - (selectedCat.shape === 'circle' ? selectedCat.radius * Math.min(gameDisplay.scaleX, gameDisplay.scaleY) : selectedCat.height *gameDisplay.scaleY );
+    const maxJumpHeight = selectedCat.jumpHeight * gameDisplay.scaleY;
+    const targetY = groundLevel - maxJumpHeight;
     if (selectedCat.isJumping) {
-        const groundLevel = background.floorY - (selectedCat.shape === 'circle' ? selectedCat.radius : selectedCat.height);
-        const maxJumpHeight = selectedCat.jumpHeight;
-        const targetY = groundLevel - maxJumpHeight;
-
-        // 更新小貓的 Y 軸位置 : 上升階段
+        // 上升階段
         if (selectedCat.velocityY < 0) {
-            if (selectedCat.isJumping && selectedCat.y > targetY) {
+            if (selectedCat.y > targetY) {
                 selectedCat.y += selectedCat.velocityY;
             } else {
-                selectedCat.velocityY = 0;
+                selectedCat.velocityY = 0; // 到達最高點，準備下落
             }
         }
-
-        // 更新小貓的 Y 軸位置 : 下降階段
-        if (selectedCat.velocityY >= 0) {
+        // 下降階段
+        else {
             selectedCat.velocityY += (gravity + selectedCat.catGravity);
             selectedCat.y += selectedCat.velocityY;
         }
-
-        // 碰撞地面
-        if (selectedCat.y >= groundLevel) {
-            selectedCat.y = groundLevel;
-            selectedCat.isJumping = false;
-            selectedCat.velocityY = 0;
-        }
+    } else {
+        // 如果不在跳躍，則施加重力使其下落
+        selectedCat.velocityY += (gravity + selectedCat.catGravity);
+        selectedCat.y += selectedCat.velocityY;
     }
+
+    // 碰撞地面
+    if (selectedCat.y >= groundLevel) {
+        selectedCat.y = groundLevel;
+        selectedCat.isJumping = false;
+        selectedCat.velocityY = 0;
+    }
+   
+    selectedCat.currentYScalex = selectedCat.y / gameCanvas.height;
+
+}
+
+//小貓起跳
+export function mainCatStartJump() {
+
+    const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
+
+    if (!selectedCat.isJumping) {
+        selectedCat.isJumping = true;
+        selectedCat.velocityY = -Math.sqrt(2 * gravity * selectedCat.jumpHeight); // 根據跳躍高度計算初速度
+    }
+
+}
+
+//小貓落下
+export function mainCatEndJump() {
+
+    const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
+    if (selectedCat.isJumping && selectedCat.velocityY < 0) {
+        selectedCat.velocityY = 0;
+    }
+
 }
 
 //處理物件的碰撞效果
@@ -133,6 +161,8 @@ export function createObject(ctx, gameCanvas, type, existingObjects, options = {
     if (bIsTooClose) {
         console.warn(`無法為 ${type} 生成有效位置，超過最大嘗試次數`);
     }
+
+    config.currentYScalex  = position.y / gameCanvas.height;
 
     return {
         type,

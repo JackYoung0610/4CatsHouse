@@ -1,8 +1,8 @@
 ﻿// 4CatsHouse - main.js
 // 版本號: 0.005
-export const gameVersion = 'v 0.010'
+export const gameVersion = 'v 0.011'
 
-import { gameDisplay } from './js/constants.js';
+import { gameDisplay , objectTypes} from './js/constants.js';
 import { gameStates, mainCat, background,  objects } from './js/gameState.js';
 import { getHighScore,  calculateButtonArea } from './js/utils.js';
 import { addEventListeners, removeEventListeners } from './js/eventHandlers.js';
@@ -37,11 +37,22 @@ function init_central(options = {}) {
  
     const { bInitAll = false, 
                     // 初始化選項
-                    bInitGameCanvas = false, bInitGameStates = false,bInitBackgroud = false , bInitMainCat = false, bInitObjects = false,
+                    bInitGameCanvas = false, 
+                    
+                    bInitGameStates = false,
+                    
+                    bInitBackgroud = false , 
+                    
+                    bInitMainCat = false, 
+                    bRandSelectCat = false ,
+                    bKeepMainCat = false,
 
-                    bRandSelectCat = false 
+                    bInitObjects = false,                
+                    bKeepObjects = false,
 
                 } = options;
+
+    console.log('init_central options : ',options)
 
     // 初始化畫布
     if (bInitAll || bInitGameCanvas){
@@ -57,11 +68,11 @@ function init_central(options = {}) {
     }
     // 初始化小貓
     if (bInitAll || bInitMainCat){
-        init_mainCat(bRandSelectCat);
+        init_mainCat( bRandSelectCat , {bKeepMainCat:bKeepMainCat});
     }
     // 初始化物件
      if (bInitAll || bInitObjects){
-        init_objects();
+        init_objects( gameStates.gameLevel , {bKeepObjects:bKeepObjects} );
     }
 
 }
@@ -109,7 +120,9 @@ function init_background() {
 }
 
 // 初始化 小貓
-function init_mainCat(bRandSelectCat=false) {
+function init_mainCat(bRandSelectCat=false,option=[]) {
+
+    const { bKeepMainCat = false } = option;
 
     // 亂數換小貓選擇的小貓
     if (bRandSelectCat) {
@@ -120,7 +133,11 @@ function init_mainCat(bRandSelectCat=false) {
     const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
 
     selectedCat.x = gameCanvas.width * 0.3;
-    selectedCat.y = background.floorY - (selectedCat.shape === 'circle' ? selectedCat.radius  : selectedCat.height);
+    if (bKeepMainCat) {
+        selectedCat.y = gameCanvas.height * selectedCat.currentYScalex;
+    }else{
+        selectedCat.y = background.floorY - (selectedCat.shape === 'circle' ? selectedCat.radius * Math.min(gameDisplay.scaleX, gameDisplay.scaleY) : selectedCat.height *gameDisplay.scaleY );
+    }
     selectedCat.velocityY = 0;
     selectedCat.isJumping = false;
 
@@ -128,19 +145,36 @@ function init_mainCat(bRandSelectCat=false) {
 }
 
 // 初始化 物件
-function init_objects(gameLevel = 0) {
+function init_objects(gameLevel = 0, option=[]) {
 
-    //清空
-    objects.length = 0;
+    const { bKeepObjects = false } = option;
 
-    //初始化物件表
-    objects.push(createObject(ctx, gameCanvas,'smallObstacle', objects,));
-    objects.push(createObject(ctx, gameCanvas,'mediumObstacle', objects, ));
-    objects.push(createObject(ctx, gameCanvas,'largeObstacle', objects, ));
-    objects.push(createObject(ctx, gameCanvas,'greenCan', objects,));
-    objects.push(createObject(ctx, gameCanvas,'blueCan', objects, ));
-    objects.push(createObject(ctx, gameCanvas,'goldCan', objects, ));
+    if (bKeepObjects && objects.length > 0) {
+        
+        //保留物件 : 保留座標
+        objects.forEach((object) => {
+            const config = objectTypes[object.type];
+            if (config && typeof config.generatePosition === 'function') {
+                const newPosition = config.generatePosition(gameCanvas, background);
+                object.x = gameCanvas.width *  object.currentXScalex;
+                object.y = gameCanvas.height * object.currentYScalex;
+            }
+        });
 
+    }else{
+
+        //清空
+        objects.length = 0;
+
+        //初始化物件表
+        objects.push(createObject(ctx, gameCanvas,'smallObstacle', objects,));
+        objects.push(createObject(ctx, gameCanvas,'mediumObstacle', objects, ));
+        objects.push(createObject(ctx, gameCanvas,'largeObstacle', objects, ));
+        objects.push(createObject(ctx, gameCanvas,'greenCan', objects,));
+        objects.push(createObject(ctx, gameCanvas,'blueCan', objects, ));
+        objects.push(createObject(ctx, gameCanvas,'goldCan', objects, ));
+
+    }
 }
 
 //更新判斷與畫面

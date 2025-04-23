@@ -172,12 +172,15 @@ export function drawGamePhase_StartScreen(ctx, gameCanvas) {
 
     //設定小貓位置並繪製
     const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
+    //mainCat.currentCat =  { ...mainCat.allCats[mainCat.currentCatIndex] };
+    //const selectedCat = mainCat.currentCat;
+
     if (selectedCat.shape === 'rectangle') {
-         selectedCat.x = (gameCanvas.width * 0.5) - (selectedCat.width * 0.5);
-        selectedCat.y = (gameCanvas.height * 0.5) - (selectedCat.height * 0.8) ;
+        selectedCat.x = (gameCanvas.width * 0.5) - (selectedCat.width * 0.5 * gameDisplay.scaleX);
+        selectedCat.y = (gameCanvas.height * 0.5) - (selectedCat.height * 0.8 * gameDisplay.scaleY) ;
     } else if (selectedCat.shape === 'circle') {
         selectedCat.x = (gameCanvas.width * 0.5) ;
-        selectedCat.y = (gameCanvas.height * 0.5) - (selectedCat.radius *0.8);
+        selectedCat.y = (gameCanvas.height * 0.5) - (selectedCat.radius *0.8 * Math.min(gameDisplay.scaleX, gameDisplay.scaleY));
     }
     drawCat(ctx,false);
 

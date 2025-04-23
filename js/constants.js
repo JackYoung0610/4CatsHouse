@@ -25,23 +25,25 @@ export const gravity = 0.01;
 const catSpeed = 5;
 
 // 定義遊戲的基礎速度，遊戲進行中速度會逐漸增加
-export const baseGameSpeed = 1;
+export const baseGameSpeed = 1.5;
 
 // 文字樣式定義
 export const STYLES = {
     text: {
         // 主畫面標題樣式
-        StartScreenMainTitle: { font: '48px sans-serif', color: 'black', textAlign: 'center' },
+        StartScreenMainTitle: { font: '300px sans-serif', color: 'black', textAlign: 'center' },
         // 主畫面按鈕樣式
-        StartScreenButton: { font: '24px sans-serif', color: 'black', textAlign: 'center' },
+        StartScreenButton: { font: '100px sans-serif', color: 'black', textAlign: 'center' },
         // 主畫面狀態文字樣式
-        StartScreenStatus: { font: '20px sans-serif', color: 'black', textAlign: 'start' },
+        StartScreenStatus: { font: '80px sans-serif', color: 'black', textAlign: 'start' },
+
         // 遊戲畫面狀態文字樣式
-        GameScreenStatus: { font: '20px sans-serif', color: 'black', textAlign: 'start' },
+        GameScreenStatus: { font: '80px sans-serif', color: 'black', textAlign: 'start' },
+
         // 結算畫面按鈕樣式
-        GameOverScreenButton: { font: '24px sans-serif', color: 'white', textAlign: 'center' },
+        GameOverScreenButton: { font: '100px sans-serif', color: 'white', textAlign: 'center' },
         // 結算畫面訊息樣式
-        GameOverScreenMessage: { font: '32px sans-serif', color: 'white', textAlign: 'center' }
+        GameOverScreenMessage: { font: '80px sans-serif', color: 'white', textAlign: 'center' }
     }
 };
 
@@ -85,7 +87,7 @@ export const objectTypes = {
 
         width: 50,
         height: 50,
-        radius: 10, // 圓形需要半徑
+        radius: 25, // 圓形需要半徑
 
         speedBonus:0.5,
 
@@ -95,7 +97,7 @@ export const objectTypes = {
         currentXScalex : 0,
         currentYScalex : 0,
 
-        yRandomSpread:30,
+        yRandomSpread:100,
 
         generatePosition: function (gameCanvas, background) {
 
@@ -103,11 +105,11 @@ export const objectTypes = {
             let y;
 
             if (randomRange < 0.60) { 
-                y = background.floorY - ((40 + Math.random() * this.yRandomSpread)  * gameDisplay.scaleY); // 範圍 1
-            } else if (randomRange < 0.90) {
-                y = background.floorY - ((70 + Math.random() * this.yRandomSpread)  * gameDisplay.scaleY); // 範圍 2 
+                y = background.floorY - ((100 + Math.random() * this.yRandomSpread)  * gameDisplay.scaleY); // 範圍 1
+            } else if (randomRange < 0.80) {
+                y = background.floorY - ((200 + Math.random() * this.yRandomSpread)  * gameDisplay.scaleY); // 範圍 2 
             } else { 
-                y = background.floorY - ((110 + Math.random() * this.yRandomSpread)  * gameDisplay.scaleY); // 範圍 3 
+                y = background.floorY - ((350 + Math.random() * this.yRandomSpread)  * gameDisplay.scaleY); // 範圍 3 
             }
             return {
                 x: gameCanvas.width + Math.random() * gameCanvas.width,
@@ -150,9 +152,9 @@ export const objectTypes = {
         effect: 'addScore',
         value: 5,
 
-        width: 40,
-        height: 25,
-         radius: 10,
+        width: 60,
+        height: 35,
+         radius: 110,
 
          speedBonus:0,
 
@@ -162,19 +164,19 @@ export const objectTypes = {
         currentXScalex : 0,
         currentYScalex : 0,
 
-        yRandomSpread:40,
+        yRandomSpread:100,
 
         generatePosition: function (gameCanvas, background) {
 
             const randomRange = Math.random();
             let y;
 
-            if (randomRange < 0.70) { 
-                y = background.floorY - ((40 + Math.random() * this.yRandomSpread) * gameDisplay.scaleY); // 範圍 1
+            if (randomRange < 0.80) { 
+                y = background.floorY - ((100 + Math.random() * this.yRandomSpread) * gameDisplay.scaleY); // 範圍 1
             } else if (randomRange < 0.90) {
-                y = background.floorY - ((100 + Math.random() * this.yRandomSpread) * gameDisplay.scaleY); // 範圍 2 
+                y = background.floorY - ((200 + Math.random() * this.yRandomSpread) * gameDisplay.scaleY); // 範圍 2 
             } else { 
-                y = background.floorY - ((160 + Math.random() * this.yRandomSpread) * gameDisplay.scaleY); // 範圍 3 
+                y = background.floorY - ((300 + Math.random() * this.yRandomSpread) * gameDisplay.scaleY); // 範圍 3 
             }
             return {
                 x: gameCanvas.width + Math.random() * gameCanvas.width,
@@ -188,8 +190,8 @@ export const objectTypes = {
         effect: 'addScore',
         value: 10,
 
-        width: 40,
-        height: 25,
+        width: 55,
+        height: 35,
         radius: 10,
 
         speedBonus:0,
@@ -200,18 +202,18 @@ export const objectTypes = {
         currentXScalex : 0,
         currentYScalex : 0,
 
-        yRandomSpread:30,
+        yRandomSpread:100,
 
         generatePosition: function (gameCanvas, background) {
             const randomRange = Math.random();
             let y;
 
-            if (randomRange < 0.80) { 
-                y = background.floorY - ((75 + Math.random() * this.yRandomSpread) * gameDisplay.scaleY); // 範圍 1
-            } else if (randomRange < 0.90) {
-                y = background.floorY - ((150 + Math.random() * this.yRandomSpread)  * gameDisplay.scaleY); // 範圍 2 
+            if (randomRange < 0.25) { 
+                y = background.floorY - ((100 + Math.random() * this.yRandomSpread) * gameDisplay.scaleY); // 範圍 1
+            } else if (randomRange < 0.75) {
+                y = background.floorY - ((200 + Math.random() * this.yRandomSpread)  * gameDisplay.scaleY); // 範圍 2 
             } else { 
-                y = background.floorY - ((50 + Math.random() * this.yRandomSpread) *  gameDisplay.scaleY); // 範圍 3 
+                y = background.floorY - ((350 + Math.random() * this.yRandomSpread) *  gameDisplay.scaleY); // 範圍 3 
             }
             return {
                 x: gameCanvas.width + Math.random() * gameCanvas.width,
@@ -225,8 +227,8 @@ export const objectTypes = {
         effect: 'addScore',
         value: 20,
 
-        width: 30,
-        height: 20,
+        width: 50,
+        height: 55,
         radius: 10,
 
         speedBonus:0.3,
@@ -237,22 +239,22 @@ export const objectTypes = {
         currentXScalex : 0,
         currentYScalex : 0,
 
-        yRandomSpread:20,
+        yRandomSpread:100,
 
         generatePosition: function (gameCanvas, background) {
             const randomRange = Math.random();
             let y;
 
             if (randomRange < 0.80) { 
-                y = background.floorY - ((180 + Math.random() * this.yRandomSpread)* gameDisplay.scaleY); // 範圍 1
+                y = background.floorY - ((450 + Math.random() * this.yRandomSpread)* gameDisplay.scaleY); // 範圍 1
             } else if (randomRange < 0.95) {
-                y = background.floorY - ((130 + Math.random() * this.yRandomSpread)* gameDisplay.scaleY); // 範圍 2 
+                y = background.floorY - ((250 + Math.random() * this.yRandomSpread)* gameDisplay.scaleY); // 範圍 2 
             } else { 
-                y = background.floorY - ((80 + Math.random() * this.yRandomSpread)); // 範圍 3 
+                y = background.floorY - ((100 + Math.random() * this.yRandomSpread)); // 範圍 3 
             }
             return {
                 x: gameCanvas.width + Math.random() * gameCanvas.width,
-                y: y // 隨機高度
+                y: y// 隨機高度
             };
         }
     }   

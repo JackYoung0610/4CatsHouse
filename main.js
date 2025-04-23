@@ -52,8 +52,6 @@ function init_central(options = {}) {
 
                 } = options;
 
-    console.log('init_central options : ',options)
-
     // 初始化畫布
     if (bInitAll || bInitGameCanvas){
         init_gameCanvas();

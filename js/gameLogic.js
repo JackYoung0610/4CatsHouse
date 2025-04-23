@@ -13,7 +13,14 @@ export function updateGameLogic(ctx, gameCanvas) {
     const gameSpeed = baseGameSpeed + timeBasedSpeedIncrease + scoreBasedSpeedIncrease;
 
     const selectedCat = mainCat.allCats[mainCat.currentCatIndex]
-
+    let collidingCat =  { ...selectedCat };
+    if (collidingCat.shape === 'circle'){
+        collidingCat.radius *= Math.min(gameDisplay.scaleX, gameDisplay.scaleY);
+    }else{
+        collidingCat.height *= gameDisplay.scaleY;
+        collidingCat.width *= gameDisplay.scaleX;
+    }
+    
     // 背景移動
     background.x -= gameSpeed;
     if (background.x < -background.width / 2) {
@@ -37,8 +44,17 @@ export function updateGameLogic(ctx, gameCanvas) {
             }
         }
 
+        let collidingObject =  { ...object };
+        if (collidingObject.shape === 'circle'){
+            collidingObject.radius *= Math.min(gameDisplay.scaleX, gameDisplay.scaleY);
+        }else{
+            collidingObject.height *= gameDisplay.scaleY;
+            collidingObject.width *= gameDisplay.scaleX;
+        }
+
+
         // 碰撞檢測
-        if (isColliding(selectedCat, object)) {
+        if (isColliding(collidingCat, collidingObject)) {
             handleCollision(ctx, gameCanvas, object);
         }
       });
